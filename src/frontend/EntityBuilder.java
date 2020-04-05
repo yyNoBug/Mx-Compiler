@@ -42,6 +42,7 @@ public class EntityBuilder implements ASTVisitor {
     public void visit(FunDeclNode node) {
         node.getType().accept(this);
         DefinedFunction function = (DefinedFunction) currentScope().get(node.getName());
+        if (function.getInnerScope() == null) throw new SemanticException(node.getLocation(), "error!!");
         scopeStack.push(function.getInnerScope());
         visit(node.getBody());
         popScope();
@@ -51,6 +52,7 @@ public class EntityBuilder implements ASTVisitor {
     public void visit(ClassDeclNode node) {
         DefinedClass entity = globalScope.getClass(node.getId());
         curClass = entity;
+        if (entity.getInnerScope() == null) throw new SemanticException(node.getLocation(), "error!!");
         scopeStack.push(entity.getInnerScope());
         if (node.getConstructor() != null) node.getConstructor().accept(this);
         node.getMemberFuns().forEach(x -> x.accept(this));
@@ -61,6 +63,7 @@ public class EntityBuilder implements ASTVisitor {
     @Override
     public void visit(ClassConstructorNode node) {
         DefinedFunction function = (DefinedFunction) currentScope().get(node.getName());
+        if (function.getInnerScope() == null) throw new SemanticException(node.getLocation(), "error!!");
         scopeStack.push(function.getInnerScope());
         visit(node.getBody());
         popScope();
@@ -129,6 +132,7 @@ public class EntityBuilder implements ASTVisitor {
 
     @Override
     public void visit(FunCallExprNode node) {
+        node.getFuncExpr().accept(this);
         node.getParameterList().forEach(x -> x.accept(this));
     }
 
@@ -141,6 +145,11 @@ public class EntityBuilder implements ASTVisitor {
     @Override
     public void visit(MemberExprNode node) {
         node.getExpr().accept(this);
+//        DefinedClass classEntity = node.getExpr().getType().getEntity();
+//        if (classEntity == null)
+//            throw new SemanticException(node.getLocation(), "Expression called not resolved.");
+//        Entity memberEntity = classEntity.resolveMember(node.getMember());
+//        node.setEntity(memberEntity);
     }
 
     @Override
@@ -150,6 +159,7 @@ public class EntityBuilder implements ASTVisitor {
 
     @Override
     public void visit(NewExprNode node) {
+        node.getNewType().accept(this);
         node.getDims().forEach(x -> x.accept(this));
     }
 

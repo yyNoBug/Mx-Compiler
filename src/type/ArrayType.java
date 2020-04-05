@@ -34,7 +34,12 @@ public class ArrayType extends Type {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof ArrayType &&
-                ((ArrayType) obj).baseType == baseType && ((ArrayType) obj).numDims == numDims;
+                ((ArrayType) obj).baseType.equals(baseType) && ((ArrayType) obj).numDims == numDims;
+    }
+
+    @Override
+    public boolean compacts(Type other) {
+        return this.equals(other) || (other instanceof NullType);
     }
 
     @Override

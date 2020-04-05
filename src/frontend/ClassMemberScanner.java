@@ -49,7 +49,7 @@ public class ClassMemberScanner implements ASTVisitor {
         DefinedClass classEntity = globalScope.getClass(node.getId());
         curClass = classEntity;
         scopeStack.push(classEntity.getInnerScope());
-        node.getConstructor().accept(this);
+        if (node.getConstructor() != null) node.getConstructor().accept(this);
         node.getMemberVars().forEach(x -> x.accept(this));
         node.getMemberFuns().forEach(x -> x.accept(this));
         popScope();
@@ -60,7 +60,7 @@ public class ClassMemberScanner implements ASTVisitor {
     public void visit(ClassConstructorNode node) {
         if (!curClass.getName().equals(node.getName()))
             throw new SemanticException("Constructor must have same name with its class.");
-        DefinedFunction constructor = new DefinedFunction(node);
+        DefinedFunction constructor = new DefinedFunction(node, currentScope());
         currentScope().defineFunction(constructor);
         curClass.defineConstructor(constructor);
     }

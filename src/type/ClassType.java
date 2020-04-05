@@ -32,6 +32,11 @@ public class ClassType extends Type {
     }
 
     @Override
+    public boolean compacts(Type other) {
+        return this.equals(other) || (other instanceof NullType);
+    }
+
+    @Override
     public DefinedClass getEntity() {
         return entity;
     }

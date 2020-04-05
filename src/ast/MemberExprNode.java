@@ -25,6 +25,10 @@ public class MemberExprNode extends ExprNode {
         this.entity = entity;
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

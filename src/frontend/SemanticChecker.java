@@ -4,6 +4,8 @@ import ast.*;
 import scope.*;
 import type.*;
 
+import java.util.Iterator;
+
 public class SemanticChecker implements ASTVisitor {
     private TopLevelScope globalScope;
     // private SemanticErrorListener errorListener;
@@ -33,7 +35,10 @@ public class SemanticChecker implements ASTVisitor {
             else
                 invalidInitialType = true;
             if (invalidInitialType)
-                throw new SemanticException(node.getLocation(), "Invalid initialization value");
+                throw new SemanticException(node.getLocation(), "Invalid initialization value type.");
+        } else {
+            if (node.getType().getType() instanceof VoidType)
+                throw new SemanticException(node.getLocation(), "Variables cannot be void type.");
         }
     }
 
@@ -116,8 +121,8 @@ public class SemanticChecker implements ASTVisitor {
             if (!curFunctionReturnType.equals(node.getExpr().getType()))
                 throw new SemanticException("Return type not match.");
         } else {
-            if (curFunctionReturnType instanceof VoidType)
-                throw new SemanticException("Invalid return expression.");
+            if (!(curFunctionReturnType instanceof VoidType))
+                throw new SemanticException(node.getLocation(), "Invalid return expression.");
         }
     }
 
@@ -125,22 +130,34 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(SuffixExprNode node) {
         ExprNode expr = node.getExpr();
         expr.accept(this);
+        if (!expr.isLeftValue())
+            throw new SemanticException(expr.getLocation(), "Not a left value.");
         if (!(expr.getType() instanceof IntType))
             throw new SemanticException(expr.getLocation(), "Not an int type.");
         node.setType(new IntType());
-        node.setLeftValue(true);
+        node.setLeftValue(false);
     }
 
     @Override
     public void visit(FunCallExprNode node) {
-        ExprNode function = node.getFuncExpr();
-        function.accept(this);
-        if (!(function.getType() instanceof FuncType))
-            throw new SemanticException(function.getLocation(), "Not a function.");
+        ExprNode functionNameNode = node.getFuncExpr();
+        functionNameNode.accept(this);
+        //if (!(functionNameNode.getType() instanceof FuncType))
+        DefinedFunction function = functionNameNode.getFuncEntity();
+        if (function == null)
+            throw new SemanticException(functionNameNode.getLocation(), "Not a function.");
         node.getParameterList().forEach(x -> x.accept(this));
-        if (node.getParameterList().size() == function.getFuncEntity().getParameters().size()) {
-
-        }
+        if (node.getParameterList().size() == functionNameNode.getFuncEntity().getParameters().size()) {
+            Iterator<ExprNode> iterator = node.getParameterList().iterator();
+            for (DefinedVariable parameter : function.getParameters()) {
+                ExprNode expr = iterator.next();
+                if (!parameter.getType().equals(expr.getType()))
+                    throw new SemanticException(node.getLocation(), "Parameter type not match.");
+            }
+            node.setLeftValue(false);
+            node.setType(function.getReturnType());
+        } else
+            throw new SemanticException(node.getLocation(), "Parameter list length not match.");
     }
 
     @Override
@@ -157,13 +174,16 @@ public class SemanticChecker implements ASTVisitor {
         Type baseType = ((ArrayType) array.getType()).getBaseType();
         int numDims = ((ArrayType) array.getType()).getNumDims();
         if (numDims == 1) node.setType(baseType);
-        else node.setType(new ArrayType(baseType, numDims - 1));
+        else node.setType(new ArrayType(baseType, (numDims - 1)));
     }
 
     @Override
     public void visit(MemberExprNode node) {
         node.getExpr().accept(this);
-        if (node.getExpr().getType() instanceof ClassType || node.getExpr().getType() instanceof StringType) {
+        if (node.getExpr().getType() instanceof ClassType || node.getExpr().getType() instanceof StringType
+            || node.getExpr().getType() instanceof ArrayType) {
+            if (node.getExpr().getType().getEntity() == null)
+                node.getExpr().getType().resolve(globalScope);
             DefinedClass classEntity = node.getExpr().getType().getEntity();
             Entity memberEntity = classEntity.resolveMember(node.getMember());
             if (memberEntity instanceof DefinedVariable) {
@@ -174,8 +194,8 @@ public class SemanticChecker implements ASTVisitor {
                 node.setType(memberEntity.getType());
                 node.setFuncEntity(((DefinedFunction) memberEntity));
             }
-        } else if (node.getExpr().getType() instanceof ArrayType) {
-
+        } else {
+            throw new SemanticException(node.getLocation(), "Member access error.");
         }
 
     }
@@ -188,8 +208,6 @@ public class SemanticChecker implements ASTVisitor {
             case NEG:
             case POS:
             case BITWISE_NOT:
-                if (!expr.isLeftValue())
-                    throw new SemanticException(expr.getLocation(), "Not a left value.");
                 if (!(expr.getType() instanceof IntType))
                     throw new SemanticException(expr.getLocation(), "Not an int type.");
                 node.setType(new IntType());
@@ -197,6 +215,8 @@ public class SemanticChecker implements ASTVisitor {
                 break;
             case PREFIX_DEC:
             case PREFIX_INC:
+                if (!expr.isLeftValue())
+                    throw new SemanticException(expr.getLocation(), "Not a left value.");
                 if (!(expr.getType() instanceof IntType))
                     throw new SemanticException(expr.getLocation(), "Not an int type.");
                 node.setType(new IntType());
@@ -222,13 +242,18 @@ public class SemanticChecker implements ASTVisitor {
         Type type = node.getNewType().getType();
         node.setLeftValue(false);
         if (node.getNumDims() == 0) {
-            node.setType(type);
-            // node.setFunctionSymbol(((ClassSymbol) type).getConstructor());
-            // What does HBH mean ?
+            if (type instanceof ClassType || type instanceof StringType) {
+                node.setType(type);
+                if (type.getEntity().getConstructor() != null)
+                    node.setFuncEntity(type.getEntity().getConstructor());
+            } else {
+                if (type instanceof VoidType)
+                    throw new SemanticException(node.getLocation(), "New item cannot be of Void Type.");
+                else node.setType(type);
+            }
         } else {
             node.setType(new ArrayType(type, node.getNumDims()));
         }
-        // TODO: What about new statement with constructor function ?
     }
 
     @Override
@@ -255,10 +280,6 @@ public class SemanticChecker implements ASTVisitor {
                 node.setType(new IntType());
                 break;
             case ADD:
-            case GTH:
-            case GEQ:
-            case LTH:
-            case LEQ:
                 if (lhs.getType() instanceof StringType && rhs.getType() instanceof StringType) {
                     node.setType(new StringType());
                     node.setLeftValue(false);
@@ -267,9 +288,21 @@ public class SemanticChecker implements ASTVisitor {
                     node.setLeftValue(false);
                 } else throw new SemanticException(node.getLocation(), "Invalid expression type.");
                 break;
+            case GTH:
+            case GEQ:
+            case LTH:
+            case LEQ:
+                if (lhs.getType() instanceof StringType && rhs.getType() instanceof StringType) {
+                    node.setType(new BoolType());
+                    node.setLeftValue(false);
+                } else if (lhs.getType() instanceof IntType && rhs.getType() instanceof IntType) {
+                    node.setType(new BoolType());
+                    node.setLeftValue(false);
+                } else throw new SemanticException(node.getLocation(), "Invalid expression type.");
+                break;
             case NEQ:
             case EQ:
-                if (lhs.getType().equals(rhs.getType())) {
+                if (lhs.getType().compacts(rhs.getType())) {
                     node.setType(new BoolType());
                     node.setLeftValue(false);
                 } else throw new SemanticException(node.getLocation(), "Not the same type.");
@@ -289,12 +322,12 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(AssignExprNode node) {
         ExprNode lhs = node.getLhs();
-        if (lhs.isLeftValue())
-            throw new SemanticException(lhs.getLocation(), "Invalid assignment to a left value.");
         lhs.accept(this);
+        if (!lhs.isLeftValue())
+            throw new SemanticException(lhs.getLocation(), "Invalid assignment to a left value.");
         ExprNode rhs = node.getRhs();
         rhs.accept(this);
-        if (!lhs.getType().equals(rhs.getType()))
+        if (!lhs.getType().compacts(rhs.getType()))
             throw new SemanticException(node.getLocation(), "Not the same type.");
     }
 
@@ -307,12 +340,13 @@ public class SemanticChecker implements ASTVisitor {
         } else if (entity instanceof DefinedFunction) {
             node.setLeftValue(false);
             node.setType(new FuncType());
-            node.setEntity(entity);
+            node.setFuncEntity((DefinedFunction) entity);
         } else if (entity instanceof DefinedClass) {
             node.setLeftValue(false);
             node.setType(globalScope.getClass(entity.getName()).getType());
             // TODO: This may cause huge problem, since I cannot tell whether it is a class or a variable.
-        }
+        } else
+            throw new SemanticException(node.getLocation(), "Entity not gotten.");
 
     }
 

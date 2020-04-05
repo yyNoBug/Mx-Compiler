@@ -23,7 +23,7 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
             for (MxLangParser.SectionContext sectionContext : ctx.section()) {
                 ASTNode section = visit(sectionContext);
                 if (section instanceof VarDeclListNode) declarations.addAll(((VarDeclListNode) section).getVariables());
-                declarations.add(((DeclarationNode) section));
+                else declarations.add(((DeclarationNode) section));
             }
         }
         return new ProgramNode(new Location(ctx.getStart()), declarations);
@@ -55,7 +55,7 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
         }
         if (ctx.classConstructor().size()  > 1)
             recorder.record(new Location(ctx), "More than one class constructor.");
-        if (ctx.classConstructor() == null) constructor = null;
+        if (ctx.classConstructor().size() == 0) constructor = null;
         else constructor = (ClassConstructorNode) visit(ctx.classConstructor().get(0));
         return new ClassDeclNode(new Location(ctx), id, memberVars, memberFuns, constructor);
     }
@@ -102,20 +102,22 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
         throw new CompilerException(new Location(ctx), "Parser Failed.");
     }
 
-    private ASTNode buildSimpleTypeNode(TerminalNode intT, TerminalNode bool, TerminalNode string,
+    private ASTNode buildSimpleTypeNode(TerminalNode intT, TerminalNode bool, TerminalNode string, TerminalNode voidT,
                                          TerminalNode identifier, Location location) {
         if (intT != null) return new SimpleTypeNode(location, new IntType());
         else if (bool != null) return new SimpleTypeNode(location, new BoolType());
         else if (string != null) return new SimpleTypeNode(location, new StringType());
+        else if (voidT != null) return new SimpleTypeNode(location, new VoidType());
         else if (identifier != null) return new SimpleTypeNode(location, new ClassType(identifier.getText()));
         else throw new CompilerException(location, "Invalid primitive type");
     }
 
-    private ASTNode buildArrayTypeNode(TerminalNode intT, TerminalNode bool, TerminalNode string,
+    private ASTNode buildArrayTypeNode(TerminalNode intT, TerminalNode bool, TerminalNode string, TerminalNode voidT,
                                         TerminalNode identifier, int numDim, Location location) {
         if (intT != null) return new ArrayTypeNode(location, new IntType(), numDim);
         else if (bool != null) return new ArrayTypeNode(location, new BoolType(), numDim);
-        else if (string != null) return new ArrayTypeNode(location, new StringType(), numDim);
+        else if (string != null) throw new CompilerException(location, "String cannot be base type of array.");
+        else if (voidT != null) throw new CompilerException(location, "Void cannot be base type of array.");
         else if (identifier != null) return new ArrayTypeNode(location, new ClassType(identifier.getText()), numDim);
         else throw new CompilerException(location, "Invalid primitive type");
     }
@@ -123,14 +125,14 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSimpleType(MxLangParser.SimpleTypeContext ctx) {
-        return buildSimpleTypeNode(ctx.INT(), ctx.BOOL(), ctx.STRING(), ctx.ID(), new Location(ctx));
+        return buildSimpleTypeNode(ctx.INT(), ctx.BOOL(), ctx.STRING(), ctx.VOID(), ctx.ID(), new Location(ctx));
     }
 
     @Override
     public ASTNode visitArrayType(MxLangParser.ArrayTypeContext ctx) {
         MxLangParser.SimpleTypeContext ctx0 = ctx.simpleType();
         int dimension = ctx.squareBracket().size();
-        return buildArrayTypeNode(ctx0.INT(), ctx0.BOOL(), ctx0.STRING(), ctx0.ID(),
+        return buildArrayTypeNode(ctx0.INT(), ctx0.BOOL(), ctx0.STRING(), ctx0.VOID(), ctx0.ID(),
                 dimension, new Location(ctx));
     }
 
@@ -165,22 +167,19 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitFakeNewExpr(MxLangParser.FakeNewExprContext ctx) {
-        throw new CompilerException(new Location(ctx), "Not a valid new array.");
-    }
-
-    @Override
     public ASTNode visitNewExpr(MxLangParser.NewExprContext ctx) {
         TypeNode type = ((TypeNode) visit(ctx.simpleType()));
         List<ExprNode> dims = new ArrayList<>();
         int numDims;
         if (ctx.squareBracketWithExpression() != null) {
             numDims = ctx.squareBracketWithExpression().size();
+            boolean beginNullDims = false;
             for (MxLangParser.SquareBracketWithExpressionContext squareBracketWithExpressionContext
                     : ctx.squareBracketWithExpression()) {
                 if (squareBracketWithExpressionContext.expression() != null) {
+                    if (beginNullDims) throw new CompilerException(new Location(ctx), "Not a valid new array.");
                     dims.add(((ExprNode) visit(squareBracketWithExpressionContext.expression())));
-                }
+                } else beginNullDims = true;
             }
         }
         else numDims = 0;
@@ -327,7 +326,7 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
     public ASTNode visitIfStatement(MxLangParser.IfStatementContext ctx) {
         ExprNode condition = (ExprNode) visit(ctx.expression());
         StatementNode thenStatement, elseStatement = null;
-        if (ctx.statement().size() >= 2) throw new CompilerException(new Location(ctx), "Parser failed.");
+        if (ctx.statement().size() > 2) throw new CompilerException(new Location(ctx), "Parser failed.");
         if (ctx.thenStatement == null) throw new CompilerException(new Location(ctx), "Parser failed.");
         thenStatement = (StatementNode) visit(ctx.thenStatement);
         if (ctx.elseStatement != null) elseStatement = (StatementNode) visit(ctx.elseStatement);

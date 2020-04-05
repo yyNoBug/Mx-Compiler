@@ -21,4 +21,8 @@ abstract public class Type {
     public DefinedClass getEntity() {
         return null;
     }
+
+    public boolean compacts(Type other) {
+        return this.equals(other);
+    }
 }

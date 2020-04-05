@@ -41,4 +41,8 @@ public class DefinedClass extends Entity {
     public Scope getInnerScope() {
         return innerScope;
     }
+
+    public DefinedFunction getConstructor() {
+        return constructor;
+    }
 }

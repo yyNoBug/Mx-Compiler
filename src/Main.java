@@ -3,6 +3,7 @@ import frontend.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import parser.MxLangErrorListener;
 import parser.MxLangLexer;
 import parser.MxLangParser;
 import scope.TopLevelScope;
@@ -16,12 +17,15 @@ public class Main {
         MxLangLexer lexer = new MxLangLexer(CharStreams.fromStream(in));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxLangParser parser = new MxLangParser(tokens);
+        parser.addErrorListener(new MxLangErrorListener());
         ParseTree tree = parser.program();
         ASTBuilder astBuilder = new ASTBuilder(new ASTErrorListener());
         return (ProgramNode) astBuilder.visit(tree);
     }
 
     public static void main (String[] args) throws Exception {
+
+
         InputStream in = new FileInputStream("test.txt");
 
         ProgramNode programNode = buildASTTree(in);

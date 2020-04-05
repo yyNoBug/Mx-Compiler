@@ -24,13 +24,13 @@ ID: ([a-zA-Z]) ([a-zA-Z] | DIGIT | '_')*;
 StringConstant: '"' (~[\u0000~\u001f\\"] | '\\'  [tbnr\\"])* '"';
 
 BLANK: [ \r\t\n] -> skip;
-COMMENT1: '//' .*? '\n' -> skip;
+COMMENT1: '//' ~[\r\n]* -> skip;
 COMMENT2: '/*' .*? '*/' -> skip;
 
 program: (section)* EOF;
 section: classDefinition | functionDefinition | variableDefinition;
 
-classDefinition: 'class' ID '{' (variableDefinition | functionDefinition | classConstructor)* '}';
+classDefinition: 'class' ID '{' (variableDefinition | functionDefinition | classConstructor)* '}'';';
 functionDefinition: type ID '(' functionParameterList ')' statementBlock;
 variableDefinition: vardeclStatement;
 
@@ -41,23 +41,23 @@ type:
 simpleType: INT | BOOL | VOID | STRING | ID;
 arrayType: simpleType (squareBracket)+;
 
-squareBracket: '['']';
-squareBracketWithExpression: '[' expression? ']';
-
 constant: NUM | StringConstant | NULL | TRUE | FALSE;
 functionParameterList: (parameterDeclaration (',' parameterDeclaration)*)?;
 parameterDeclaration: type ID;
 
 expression:
-// function
-  expression '(' (expression (',' expression)* )? ')' # funCallExpr
+  expression op = ('++' | '--') # suffixExpr
+// | NEW simpleType ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+ # errorNewExpr
+| NEW simpleType (squareBracketWithExpression)+ # newExpr
+| NEW simpleType ('('')')? # newExpr
+// | NEW simpleType '(' (expression (',' expression)* )?  ')' # newExpr
+| expression '(' (expression (',' expression)* )? ')' # funCallExpr
 // | expression'.'ID '(' (expression (',' expression)* )? ')'  # memberFunCallExpr
+| expression'.'ID # memberExpr
+| expression'['expression']' # arrayExpr
 | '(' expression ')' # parExpr
 | <assoc=right> op = ('!' | '+' | '-' | '~') expression # prefixExpr
-// suffix
-| expression op = ('++' | '--') # suffixExpr
-// prefix
-| <assoc=right> ('++' | '--') expression # prefixExpr
+| <assoc=right> op = ('++' | '--') expression # prefixExpr
 | expression op = ('*' | '/' | '%') expression # binaryExpr
 | expression op = ('+' | '-') expression # binaryExpr
 | expression op = ('<<' | '>>') expression # binaryExpr
@@ -72,14 +72,8 @@ expression:
 // assignment expressions
 | expression '=' expression # assignExpr
 | THIS # thisExpr
-| NEW simpleType ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+ # fakeNewExpr
-| NEW simpleType (squareBracketWithExpression)+ # newExpr
-| NEW simpleType ('('')')? # newExpr
-// | NEW simpleType '(' (expression (',' expression)* )?  ')' # newExpr
 | ID # idExpr
-| constant # constExpr
-| expression'.'ID # memberExpr
-| expression'['expression']' # arrayExpr;
+| constant # constExpr;
 
 
 // All statement type.
@@ -96,6 +90,9 @@ continueStatement: CONTINUE';';
 returnStatement: RETURN expression? ';';
 
 statementBlock: '{' statement* '}';
+
+squareBracket: '['']';
+squareBracketWithExpression: '[' expression? ']';
 
 
 whileStatement: WHILE '(' expression ')' statement;
