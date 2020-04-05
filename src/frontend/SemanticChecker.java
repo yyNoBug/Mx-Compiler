@@ -73,7 +73,11 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(ExprStatementNode node) {
         node.getExpression().accept(this);
-        // TODO: What if the expression is a class ?
+    }
+
+    @Override
+    public void visit(VarDeclStatementNode node) {
+        node.getVariable().accept(this);
     }
 
     @Override
@@ -348,11 +352,11 @@ public class SemanticChecker implements ASTVisitor {
             node.setType(new FuncType());
             node.setFuncEntity((DefinedFunction) entity);
         } else if (entity instanceof DefinedClass) {
-            node.setLeftValue(false);
-            node.setType(globalScope.getClass(entity.getName()).getType());
-            // TODO: This may cause huge problem, since I cannot tell whether it is a class or a variable.
+            throw new SemanticException ("error!");
+            // This may cause huge problem, since I cannot tell whether it is a class or a variable.
+            // But it seems that our program never reaches here.
         } else
-            throw new SemanticException(node.getLocation(), "Entity not gotten.");
+            throw new SemanticException(node.getLocation(), "ID not resolved.");
 
     }
 

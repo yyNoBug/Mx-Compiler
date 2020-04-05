@@ -46,6 +46,11 @@ public class ClassDeclScanner implements ASTVisitor {
     }
 
     @Override
+    public void visit(VarDeclStatementNode node) {
+        node.getVariable().accept(this);
+    }
+
+    @Override
     public void visit(IfStatementNode node) {
 
     }

@@ -327,9 +327,21 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
         ExprNode condition = (ExprNode) visit(ctx.expression());
         StatementNode thenStatement, elseStatement = null;
         if (ctx.statement().size() > 2) throw new CompilerException(new Location(ctx), "Parser failed.");
+
         if (ctx.thenStatement == null) throw new CompilerException(new Location(ctx), "Parser failed.");
-        thenStatement = (StatementNode) visit(ctx.thenStatement);
-        if (ctx.elseStatement != null) elseStatement = (StatementNode) visit(ctx.elseStatement);
+        ASTNode node = visit(ctx.thenStatement);
+        if (node instanceof StatementNode || node == null)
+            thenStatement = (StatementNode) node;
+        else
+            thenStatement = new VarDeclStatementNode((VarDeclListNode) node, node.getLocation());
+
+        ASTNode node2 = null;
+        if (ctx.elseStatement != null) node2 = visit(ctx.elseStatement);
+        if (node2 instanceof StatementNode || node2 == null)
+            elseStatement = (StatementNode) node2;
+        else
+            elseStatement = new VarDeclStatementNode((VarDeclListNode) node2, node2.getLocation());
+        //if (ctx.elseStatement != null) elseStatement = (StatementNode) visit(ctx.elseStatement);
 
         return new IfStatementNode(new Location(ctx), condition, thenStatement, elseStatement);
     }
@@ -401,7 +413,14 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitWhileStatement(MxLangParser.WhileStatementContext ctx) {
         ExprNode condition = (ExprNode) visit(ctx.expression());
-        StatementNode body = (StatementNode) visit(ctx.statement());
+
+        ASTNode node = visit(ctx.statement());
+        StatementNode body;
+        if (node instanceof StatementNode || node == null)
+            body = (StatementNode) node;
+        else
+            body = new VarDeclStatementNode((VarDeclListNode) node, node.getLocation());
+
         return new WhileStatementNode(new Location(ctx), condition, body);
     }
 
@@ -414,7 +433,13 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
         else condition = null;
         if (ctx.step != null) step = (ExprNode) visit(ctx.step);
         else step = null;
-        StatementNode body = (StatementNode) visit(ctx.statement());
+        ASTNode node = visit(ctx.statement());
+        StatementNode body;
+        if (node instanceof StatementNode || node == null)
+            body = (StatementNode) node;
+        else
+            body = new VarDeclStatementNode((VarDeclListNode) node, node.getLocation());
+        //StatementNode body = (StatementNode) visit(ctx.statement());
         return new ForStatementNode(new Location(ctx), init, condition, step, body);
     }
 

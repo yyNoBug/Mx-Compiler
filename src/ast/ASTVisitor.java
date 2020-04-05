@@ -9,6 +9,7 @@ public interface ASTVisitor {
     void visit(ClassConstructorNode node);
     void visit(StatementBlockNode node);
     void visit(ExprStatementNode node);
+    void visit(VarDeclStatementNode node);
     void visit(IfStatementNode node);
     void visit(WhileStatementNode node);
     void visit(ForStatementNode node);

@@ -28,7 +28,6 @@ public class GlobalFuncDeclScanner implements ASTVisitor {
         Type returnType = node.getType().getType();
         DefinedFunction function = new DefinedFunction(node, globalScope);
         globalScope.defineFunction(function);
-        // TODO: The second type system! (Type not resolved!)
     }
 
     @Override
@@ -49,6 +48,11 @@ public class GlobalFuncDeclScanner implements ASTVisitor {
     @Override
     public void visit(ExprStatementNode node) {
 
+    }
+
+    @Override
+    public void visit(VarDeclStatementNode node) {
+        node.getVariable().accept(this);
     }
 
     @Override

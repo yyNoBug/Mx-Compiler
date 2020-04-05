@@ -42,8 +42,6 @@ public class BuiltinFunctionInitializer{
         parameterList_toString.add(new DefinedVariable("i", new IntType()));
         globalScope.defineFunction(new DefinedFunction("toString", new StringType(),
                 parameterList_toString));
-
-        // What does HBH mean by initHacker ?
     }
 
 }
