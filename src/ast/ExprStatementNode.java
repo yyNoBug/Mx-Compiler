@@ -11,4 +11,9 @@ public class ExprStatementNode extends StatementNode{
     public ExprNode getExpression() {
         return expression;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

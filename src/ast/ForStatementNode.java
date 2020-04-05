@@ -1,6 +1,6 @@
 package ast;
 
-public class ForStatementNode extends LoopStatementNode {
+public class ForStatementNode extends StatementNode {
     private ExprNode init, cond, step;
     private StatementNode statement;
 
@@ -26,5 +26,10 @@ public class ForStatementNode extends LoopStatementNode {
 
     public StatementNode getStatement() {
         return statement;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

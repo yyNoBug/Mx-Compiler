@@ -10,4 +10,6 @@ abstract public class ASTNode {
     public Location getLocation() {
         return location;
     }
+
+    abstract public void accept(ASTVisitor visitor);
 }

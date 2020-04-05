@@ -31,4 +31,9 @@ public class FunDeclNode extends DeclarationNode {
     public StatementBlockNode getBody() {
         return body;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

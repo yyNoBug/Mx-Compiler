@@ -23,4 +23,9 @@ public class VarDeclSingleNode extends DeclarationNode {
     public ExprNode getExpr() {
         return expr;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

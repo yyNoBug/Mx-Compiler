@@ -21,4 +21,9 @@ public class SuffixExprNode extends  ExprNode {
     public ExprNode getExpr() {
         return expr;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

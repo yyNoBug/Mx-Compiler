@@ -22,4 +22,9 @@ public class IfStatementNode extends StatementNode {
     public StatementNode getElseStatement() {
         return elseStatement;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -25,4 +25,9 @@ public class NewExprNode extends  ExprNode {
     public List<ExprNode> getDims() {
         return dims;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -16,4 +16,9 @@ public class NumConstNode extends ExprNode {
     public int getVal() {
         return val;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -1,14 +1,18 @@
 package ast;
 
+import scope.DefinedFunction;
+import type.Type;
+
 abstract public class ExprNode extends ASTNode {
-    private String type;
+    private Type type;
     private boolean isLeftValue;
+    private DefinedFunction funcEntity = null;
 
     public ExprNode(Location loc) {
         super(loc);
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
@@ -16,11 +20,19 @@ abstract public class ExprNode extends ASTNode {
         return isLeftValue;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
     public void setLeftValue(boolean leftValue) {
         isLeftValue = leftValue;
+    }
+
+    public void setFuncEntity(DefinedFunction funcEntity) {
+        this.funcEntity = funcEntity;
+    }
+
+    public DefinedFunction getFuncEntity() {
+        return funcEntity;
     }
 }

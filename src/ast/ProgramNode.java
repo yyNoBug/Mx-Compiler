@@ -13,4 +13,9 @@ public class ProgramNode extends ASTNode {
     public List<DeclarationNode> getSection_list() {
         return section_list;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

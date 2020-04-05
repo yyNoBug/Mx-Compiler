@@ -2,7 +2,7 @@ package ast;
 
 import java.util.List;
 
-public class VarDeclListNode extends DeclarationNode {
+public class VarDeclListNode extends ASTNode {
     private TypeNode type;
     private List<VarDeclSingleNode> variables;
 
@@ -18,5 +18,10 @@ public class VarDeclListNode extends DeclarationNode {
 
     public List<VarDeclSingleNode> getVariables() {
         return variables;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        System.out.println("How can that be ???");
     }
 }

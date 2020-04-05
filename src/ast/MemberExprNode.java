@@ -1,8 +1,11 @@
 package ast;
 
+import scope.Entity;
+
 public class MemberExprNode extends ExprNode {
     private ExprNode expr;
     private String member;
+    private Entity entity;
 
     public MemberExprNode(Location loc, ExprNode expr, String member) {
         super(loc);
@@ -16,5 +19,14 @@ public class MemberExprNode extends ExprNode {
 
     public String getMember() {
         return member;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -2,7 +2,7 @@ package frontend;
 
 import ast.Location;
 
-public class ASTErrorRecorder {
+public class SemanticErrorListener {
     private boolean hasErrorOccurred = false;
 
     public void record (Location location, String message) {
@@ -14,3 +14,4 @@ public class ASTErrorRecorder {
         if (hasErrorOccurred) throw new ASTException();
     }
 }
+

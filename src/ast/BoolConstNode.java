@@ -11,4 +11,9 @@ public class BoolConstNode extends ExprNode {
     public boolean isBool() {
         return bool;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -72,6 +72,7 @@ expression:
 // assignment expressions
 | expression '=' expression # assignExpr
 | THIS # thisExpr
+| NEW simpleType ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+ # fakeNewExpr
 | NEW simpleType (squareBracketWithExpression)+ # newExpr
 | NEW simpleType ('('')')? # newExpr
 // | NEW simpleType '(' (expression (',' expression)* )?  ')' # newExpr
@@ -82,7 +83,8 @@ expression:
 
 
 // All statement type.
-vardeclStatement: type(squareBracket)? ID('=' expression)? (','ID('=' expression)?)* ';';
+variableDeclarator: ID('=' expression)?;
+vardeclStatement: type variableDeclarator (',' variableDeclarator)* ';';
 ifStatement: IF '(' expression ')' thenStatement = statement
 | IF '(' expression ')' thenStatement = statement ELSE elseStatement = statement;
 loopStatement: whileStatement | forStatement;

@@ -16,4 +16,10 @@ public class ArrayExprNode extends ExprNode {
     public ExprNode getIndex() {
         return index;
     }
+
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

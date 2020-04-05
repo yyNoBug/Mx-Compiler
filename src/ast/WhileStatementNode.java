@@ -1,6 +1,6 @@
 package ast;
 
-public class WhileStatementNode extends LoopStatementNode {
+public class WhileStatementNode extends StatementNode {
     private ExprNode condition;
     private StatementNode body;
 
@@ -16,5 +16,10 @@ public class WhileStatementNode extends LoopStatementNode {
 
     public StatementNode getBody() {
         return body;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

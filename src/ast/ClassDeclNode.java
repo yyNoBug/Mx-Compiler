@@ -21,7 +21,7 @@ public class ClassDeclNode extends DeclarationNode {
         return id;
     }
 
-    public List<VarDeclSingleNode> getMembersVars() {
+    public List<VarDeclSingleNode> getMemberVars() {
         return membersVars;
     }
 
@@ -31,5 +31,10 @@ public class ClassDeclNode extends DeclarationNode {
 
     public ClassConstructorNode getConstructor() {
         return constructor;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

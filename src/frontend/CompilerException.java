@@ -9,4 +9,9 @@ public class CompilerException extends RuntimeException {
         super(message);
         this.location = location;
     }
+
+    @Override
+    public String getMessage() {
+        return "Error at Line: "+ location + " " + super.getMessage();
+    }
 }

@@ -11,4 +11,9 @@ public class StringConstNode extends ExprNode {
     public String getStr() {
         return str;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

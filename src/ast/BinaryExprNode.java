@@ -24,15 +24,20 @@ public class BinaryExprNode extends ExprNode {
         this.rhs = rhs;
     }
 
-    public void setOp(Op op) {
-        this.op = op;
+    public Op getOp() {
+        return op;
     }
 
-    public void setLhs(ExprNode lhs) {
-        this.lhs = lhs;
+    public ExprNode getLhs() {
+        return lhs;
     }
 
-    public void setRhs(ExprNode rhs) {
-        this.rhs = rhs;
+    public ExprNode getRhs() {
+        return rhs;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }
