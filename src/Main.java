@@ -15,6 +15,7 @@ public class Main {
 
     private static ProgramNode buildASTTree(InputStream in) throws Exception {
         MxLangLexer lexer = new MxLangLexer(CharStreams.fromStream(in));
+        lexer.addErrorListener(new MxLangErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxLangParser parser = new MxLangParser(tokens);
         parser.addErrorListener(new MxLangErrorListener());

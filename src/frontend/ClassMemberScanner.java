@@ -39,6 +39,8 @@ public class ClassMemberScanner implements ASTVisitor {
 
     @Override
     public void visit(FunDeclNode node) {
+        if (node.getName().equals(curClass.getName()))
+            throw new SemanticException(node.getLocation(), "Member function should not have the same name with class.");
         DefinedFunction function = new DefinedFunction(node, currentScope());
         currentScope().defineFunction(function);
         curClass.defineMemberFunction(function);

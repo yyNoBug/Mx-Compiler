@@ -85,7 +85,7 @@ public class EntityBuilder implements ASTVisitor {
     @Override
     public void visit(IfStatementNode node) {
         node.getCondition().accept(this);
-        node.getThenStatement().accept(this);
+        if (node.getThenStatement() != null) node.getThenStatement().accept(this);
         if (node.getElseStatement() != null) node.getElseStatement().accept(this);
     }
 
@@ -93,7 +93,8 @@ public class EntityBuilder implements ASTVisitor {
     public void visit(WhileStatementNode node) {
         loopCounter++;
         node.getCondition().accept(this);
-        node.getBody().accept(this);
+        if (node.getBody() != null)
+            node.getBody().accept(this);
         loopCounter--;
     }
 
@@ -105,8 +106,9 @@ public class EntityBuilder implements ASTVisitor {
         if (node.getInit() != null) node.getInit().accept(this);
         if (node.getCond() != null) node.getCond().accept(this);
         if (node.getStep() != null) node.getStep().accept(this);
-        node.getStatement().accept(this);
+        if (node.getStatement() != null) node.getStatement().accept(this);
         loopCounter--;
+        popScope();
     }
 
     @Override

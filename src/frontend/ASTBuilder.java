@@ -116,7 +116,7 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
                                         TerminalNode identifier, int numDim, Location location) {
         if (intT != null) return new ArrayTypeNode(location, new IntType(), numDim);
         else if (bool != null) return new ArrayTypeNode(location, new BoolType(), numDim);
-        else if (string != null) throw new CompilerException(location, "String cannot be base type of array.");
+        else if (string != null) return new ArrayTypeNode(location, new StringType(), numDim);
         else if (voidT != null) throw new CompilerException(location, "Void cannot be base type of array.");
         else if (identifier != null) return new ArrayTypeNode(location, new ClassType(identifier.getText()), numDim);
         else throw new CompilerException(location, "Invalid primitive type");

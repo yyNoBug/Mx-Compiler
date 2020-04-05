@@ -51,11 +51,17 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(ClassConstructorNode node) {
+        curFunctionReturnType = node.getType().getType();
+        if (!(curFunctionReturnType instanceof VoidType))
+            throw new SemanticException(node.getLocation(), "error!!");
         visit(node.getBody());
+        curFunctionReturnType = null;
     }
 
     @Override
     public void visit(ClassDeclNode node) {
+        if (node.getConstructor() != null)
+            node.getConstructor().accept(this);
         node.getMemberFuns().forEach(x -> x.accept(this));
     }
 
@@ -75,7 +81,7 @@ public class SemanticChecker implements ASTVisitor {
         node.getCondition().accept(this);
         if (!(node.getCondition().getType() instanceof BoolType))
             throw new SemanticException(node.getCondition().getLocation(),"Not a bool condition.");
-        node.getThenStatement().accept(this);
+        if (node.getThenStatement() != null) node.getThenStatement().accept(this);
         if (node.getElseStatement() != null) node.getElseStatement().accept(this);
     }
 
@@ -84,7 +90,7 @@ public class SemanticChecker implements ASTVisitor {
         node.getCondition().accept(this);
         if (!(node.getCondition().getType() instanceof BoolType))
             throw new SemanticException(node.getCondition().getLocation(), "Not a bool condition.");
-        node.getBody().accept(this);
+        if (node.getBody() != null) node.getBody().accept(this);
     }
 
     @Override
@@ -97,7 +103,7 @@ public class SemanticChecker implements ASTVisitor {
             }
         }
         if (node.getStep() != null) node.getStep().accept(this);
-        node.getStatement().accept(this);
+        if (node.getStatement() != null) node.getStatement().accept(this);
     }
 
     @Override
@@ -118,8 +124,8 @@ public class SemanticChecker implements ASTVisitor {
             if (curFunctionReturnType instanceof VoidType)
                 throw new SemanticException("Invalid return expression.");
             node.getExpr().accept(this);
-            if (!curFunctionReturnType.equals(node.getExpr().getType()))
-                throw new SemanticException("Return type not match.");
+            if (!curFunctionReturnType.compacts(node.getExpr().getType()))
+                throw new SemanticException(node.getLocation(), "Return type not match.");
         } else {
             if (!(curFunctionReturnType instanceof VoidType))
                 throw new SemanticException(node.getLocation(), "Invalid return expression.");
@@ -151,7 +157,7 @@ public class SemanticChecker implements ASTVisitor {
             Iterator<ExprNode> iterator = node.getParameterList().iterator();
             for (DefinedVariable parameter : function.getParameters()) {
                 ExprNode expr = iterator.next();
-                if (!parameter.getType().equals(expr.getType()))
+                if (!parameter.getType().compacts(expr.getType()))
                     throw new SemanticException(node.getLocation(), "Parameter type not match.");
             }
             node.setLeftValue(false);

@@ -30,10 +30,10 @@ public class BuiltinFunctionInitializer{
         parameterList_printInt.add(new DefinedVariable("n", new IntType()));
         globalScope.defineFunction(new DefinedFunction("printInt", new VoidType(),
                 parameterList_printInt));
-        List<DefinedVariable> parameterList_printIntLn = new ArrayList<>();
-        parameterList_printIntLn.add(new DefinedVariable("n", new IntType()));
-        globalScope.defineFunction(new DefinedFunction("printIntLn", new VoidType(),
-                parameterList_printIntLn));
+        List<DefinedVariable> parameterList_printlnInt = new ArrayList<>();
+        parameterList_printlnInt.add(new DefinedVariable("n", new IntType()));
+        globalScope.defineFunction(new DefinedFunction("printlnInt", new VoidType(),
+                parameterList_printlnInt));
         globalScope.defineFunction(new DefinedFunction("getString", new StringType(),
                 new ArrayList<>()));
         globalScope.defineFunction(new DefinedFunction("getInt", new IntType(),

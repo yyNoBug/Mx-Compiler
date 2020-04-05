@@ -21,7 +21,7 @@ THIS: 'this';
 NUM: DIGIT+;
 DIGIT: [0-9];
 ID: ([a-zA-Z]) ([a-zA-Z] | DIGIT | '_')*;
-StringConstant: '"' (~[\u0000~\u001f\\"] | '\\'  [tbnr\\"])* '"';
+StringConstant: '"' (~[\u0000-\u001f\\"] | '\\'  [tbnr\\"])* '"';
 
 BLANK: [ \r\t\n] -> skip;
 COMMENT1: '//' ~[\r\n]* -> skip;
