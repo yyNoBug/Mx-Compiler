@@ -9,4 +9,9 @@ public class StringConst extends Register {
         super("s" + stringCount++);
         this.str = str;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

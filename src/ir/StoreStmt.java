@@ -7,4 +7,9 @@ public class StoreStmt extends YyStmt {
         this.src = src;
         this.dest = dest;
     }
+
+    @Override
+    public String toString() {
+        return "store " + src + " to " + dest;
+    }
 }

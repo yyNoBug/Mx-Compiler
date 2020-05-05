@@ -38,7 +38,9 @@ public class Main {
         new ClassMemberScanner(globalScope).visit(programNode);
         new EntityBuilder(globalScope).visit(programNode);
         new SemanticChecker(globalScope).visit(programNode);
-        new IRBuilder(globalScope).visit(programNode);
+        var irBuilder = new IRBuilder(globalScope);
+        irBuilder.visit(programNode);
+        irBuilder.printIR();
     }
 
 

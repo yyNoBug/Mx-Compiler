@@ -6,4 +6,9 @@ public class JmpStmt extends TerminalStmt {
     public JmpStmt(Block destination) {
         this.destination = destination;
     }
+
+    @Override
+    public String toString() {
+        return "goto " + destination;
+    }
 }

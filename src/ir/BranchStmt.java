@@ -10,4 +10,9 @@ public class BranchStmt extends TerminalStmt {
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
     }
+
+    @Override
+    public String toString() {
+        return "branch " + condition + " true -> " + thenBlock + " false -> " + elseBlock;
+    }
 }

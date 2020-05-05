@@ -6,4 +6,9 @@ public class AllocateStmt extends YyStmt {
     public AllocateStmt(Register item) {
         this.item = item;
     }
+
+    @Override
+    public String toString() {
+        return "allocate " + item;
+    }
 }

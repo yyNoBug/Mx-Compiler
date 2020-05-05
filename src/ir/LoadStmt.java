@@ -8,4 +8,9 @@ public class LoadStmt extends YyStmt {
         this.src = src;
         this.dest = dest;
     }
+
+    @Override
+    public String toString() {
+        return dest + " = load " + src;
+    }
 }

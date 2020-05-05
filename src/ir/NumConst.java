@@ -7,4 +7,9 @@ public class NumConst extends Register {
         super("Constant:" + value);
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return value + "";
+    }
 }

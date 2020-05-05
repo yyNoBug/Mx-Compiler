@@ -7,4 +7,9 @@ public class Global extends Register {
         super("g" + globalCount);
         globalCount++;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

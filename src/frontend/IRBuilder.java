@@ -16,6 +16,7 @@ public class IRBuilder implements ASTVisitor {
     private DeclaredFunction curFunction;
     private Block curBlock;
     private Register curReg;
+    private String curClassName;
     private Stack<Boolean> leftValueRequireStack = new Stack<>();
     private boolean isVisitingGlobalVariable;
     private boolean isVisitingParameter;
@@ -34,6 +35,19 @@ public class IRBuilder implements ASTVisitor {
         BuiltinFunction.setFunctionMap(functionMap, globalScope);
     }
 
+    public void printIR(){
+        var map = globalMap.getGlobalList();
+        for (DefinedVariable definedVariable : map) {
+            System.out.println("global " + idMap.get(definedVariable));
+        }
+        System.out.println();
+        for (Function function : functions) {
+            System.out.println("fun " + function + "()");
+            function.printIR();
+            System.out.println();
+        }
+    }
+
     @Override
     public void visit(ProgramNode node) {
         isVisitingGlobalVariable = true;
@@ -46,6 +60,8 @@ public class IRBuilder implements ASTVisitor {
         isVisitingGlobalVariable = false;
         for (DeclarationNode declarationNode : node.getSection_list()) {
             if (!(declarationNode instanceof VarDeclSingleNode))
+                if (declarationNode instanceof ClassDeclNode) curClassName = ((ClassDeclNode) declarationNode).getId();
+                else curClassName = null;
                 declarationNode.accept(this);
         }
     }
@@ -75,9 +91,9 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(FunDeclNode node) {
-        curFunction = new DeclaredFunction();
+        if (curClassName == null) curFunction = new DeclaredFunction(node.getName());
+        else curFunction = new DeclaredFunction(curClassName + "." + node.getName());
         functions.add(curFunction);
-        node.getBody().accept(this);
 
         Block entry = new Block("entry");
 
@@ -115,7 +131,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ClassConstructorNode node) {
-        curFunction = new DeclaredFunction();
+        curFunction = new DeclaredFunction(node.getClass().getName() + ".__constructor__");
         functions.add(curFunction);
         node.getBody().accept(this);
 

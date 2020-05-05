@@ -12,4 +12,17 @@ public class CallStmt extends YyStmt {
         this.parameters = parameters;
         this.result = result;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder(result + " = " + function + "(");
+        boolean flag = false;
+        for (Register parameter : parameters) {
+            if (flag) ret.append(" ,");
+            ret.append(parameter);
+            flag = true;
+        }
+        ret.append(")");
+        return ret.toString();
+    }
 }

@@ -7,4 +7,9 @@ public class Local extends Register {
         super("v" + localCount);
         localCount++;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

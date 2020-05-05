@@ -10,4 +10,17 @@ public class PhiStmt extends Statement {
         this.target = target;
         this.map = map;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder(target + " = phi");
+        for (var i : map.entrySet()){
+            ret.append(" (");
+            ret.append(i.getKey());
+            ret.append(" -> ");
+            ret.append(i.getValue());
+            ret.append(")");
+        }
+        return ret.toString();
+    }
 }
