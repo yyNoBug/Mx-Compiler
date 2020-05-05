@@ -1,15 +1,15 @@
 package ast;
 
 public class BoolConstNode extends ExprNode {
-    private boolean bool;
+    private boolean val;
 
-    public BoolConstNode(Location loc, boolean bool) {
+    public BoolConstNode(Location loc, boolean val) {
         super(loc);
-        this.bool = bool;
+        this.val = val;
     }
 
-    public boolean isBool() {
-        return bool;
+    public boolean getVal() {
+        return val;
     }
 
     @Override

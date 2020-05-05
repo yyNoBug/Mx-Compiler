@@ -1,10 +1,12 @@
 package ast;
 
 import scope.DefinedClass;
+import scope.DefinedVariable;
 
 public class ThisExprNode extends ExprNode {
 
     private DefinedClass classEntity;
+    private DefinedVariable entity;
 
     public ThisExprNode(Location loc) {
         super(loc);
@@ -14,8 +16,16 @@ public class ThisExprNode extends ExprNode {
         return classEntity;
     }
 
+    public DefinedVariable getEntity() {
+        return entity;
+    }
+
     public void setClassEntity(DefinedClass classEntity) {
         this.classEntity = classEntity;
+    }
+
+    public void setEntity(DefinedVariable entity) {
+        this.entity = entity;
     }
 
     @Override

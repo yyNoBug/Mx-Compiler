@@ -23,4 +23,8 @@ abstract public class Entity {
     public void resolveType(TopLevelScope globalScope) {
         type.resolve(globalScope);
     }
+
+    public int calOffset(String member){
+        return 0;
+    }
 }

@@ -16,11 +16,11 @@ public interface ASTVisitor {
     void visit(ContinueStatementNode node);
     void visit(BreakStatementNode node);
     void visit(ReturnStatementNode node);
-    void visit(SuffixExprNode node);
     void visit(FunCallExprNode node);
     void visit(ArrayExprNode node);
     void visit(MemberExprNode node);
     void visit(PrefixExprNode node);
+    void visit(SuffixExprNode node);
     void visit(NewExprNode node);
     void visit(BinaryExprNode node);
     void visit(AssignExprNode node);
@@ -33,4 +33,8 @@ public interface ASTVisitor {
     void visit(TypeNode node);
     void visit(ArrayTypeNode node);
     // There may be something missing.
+
+    default void visit(ASTNode node) {
+        node.accept(this);
+    }
 }

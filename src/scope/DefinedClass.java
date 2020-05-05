@@ -10,6 +10,8 @@ public class DefinedClass extends Entity {
     private DefinedFunction constructor;
     private Map<String, DefinedVariable> variableMap = new LinkedHashMap<>();
     private Map<String, DefinedFunction> functionMap = new LinkedHashMap<>();
+    private int varCounter = 0;
+    private Map<String, Integer> variableCountMap = new LinkedHashMap<>();
 
     public DefinedClass(String name, Type type, Scope innerScope) {
         super(name, type);
@@ -20,6 +22,7 @@ public class DefinedClass extends Entity {
         if (variableMap.containsKey(var.getName()) || functionMap.containsKey(var.getName()))
             throw new SemanticException("Name "+ var.getName() + "has been defined.");
         variableMap.put(var.getName(), var);
+        variableCountMap.put(var.getName(), varCounter++);
     }
 
     public void defineMemberFunction(DefinedFunction function) {
@@ -44,5 +47,14 @@ public class DefinedClass extends Entity {
 
     public DefinedFunction getConstructor() {
         return constructor;
+    }
+
+    @Override
+    public int calOffset(String member) {
+        return variableCountMap.get(member);
+    }
+
+    public int getClassSize() {
+        return (varCounter + 1) * 4;
     }
 }

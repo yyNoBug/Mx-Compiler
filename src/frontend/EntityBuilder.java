@@ -10,7 +10,8 @@ public class EntityBuilder implements ASTVisitor {
     private TopLevelScope globalScope;
     private Stack<Scope> scopeStack = new Stack<>();
     private DefinedClass curClass = null;
-    private int loopCounter = 0;
+    //private int loopCounter = 0;
+    private Stack<ASTNode> loopStack = new Stack<>();
 
     public EntityBuilder(TopLevelScope globalScope) {
         this.globalScope = globalScope;
@@ -35,6 +36,7 @@ public class EntityBuilder implements ASTVisitor {
         node.getType().accept(this);
         if (node.getExpr() != null) node.getExpr().accept(this);
         DefinedVariable var = new DefinedVariable(node);
+        node.setEntity(var);
         currentScope().defineVariable(var);
     }
 
@@ -96,34 +98,42 @@ public class EntityBuilder implements ASTVisitor {
 
     @Override
     public void visit(WhileStatementNode node) {
-        loopCounter++;
+        //loopCounter++;
+        loopStack.push(node);
         node.getCondition().accept(this);
         if (node.getBody() != null)
             node.getBody().accept(this);
-        loopCounter--;
+        loopStack.pop();
+        //loopCounter--;
     }
 
     @Override
     public void visit(ForStatementNode node) {
         LocalScope localScope = new LocalScope(currentScope());
         scopeStack.push(localScope);
-        loopCounter++;
+        //loopCounter++;
+        loopStack.push(node);
         if (node.getInit() != null) node.getInit().accept(this);
         if (node.getCond() != null) node.getCond().accept(this);
         if (node.getStep() != null) node.getStep().accept(this);
         if (node.getStatement() != null) node.getStatement().accept(this);
-        loopCounter--;
+        //loopCounter--;
+        loopStack.pop();
         popScope();
     }
 
     @Override
     public void visit(ContinueStatementNode node) {
-        if (loopCounter == 0) throw new SemanticException("Continue statement not in loop.");
+        // if (loopCounter == 0) throw new SemanticException("Continue statement not in loop.");
+        if (loopStack.empty()) throw new SemanticException("Continue statement not in loop.");
+        node.setLoopNode(loopStack.peek());
     }
 
     @Override
     public void visit(BreakStatementNode node) {
-        if (loopCounter == 0) throw new SemanticException("Break statement not in loop.");
+        // if (loopCounter == 0) throw new SemanticException("Break statement not in loop.");
+        if (loopStack.empty()) throw new SemanticException("Continue statement not in loop.");
+        node.setLoopNode(loopStack.peek());
     }
 
     @Override
@@ -194,6 +204,7 @@ public class EntityBuilder implements ASTVisitor {
         if (curClass == null)
             throw new SemanticException("This statement not in class.");
         node.setClassEntity(curClass);
+        node.setEntity(((DefinedVariable) currentScope().get("this")));
     }
 
     @Override

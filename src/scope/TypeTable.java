@@ -20,24 +20,24 @@ public class TypeTable {
 
         DefinedClass stringEntity = new DefinedClass("string", new IntType(), new LocalScope(globalScope));
         stringEntity.defineMemberFunction(new DefinedFunction("length", new IntType(),
-                new ArrayList<>()));
+                new ArrayList<>(), true));
         List<DefinedVariable> parameterList_substring = new ArrayList<>();
         parameterList_substring.add(new DefinedVariable("left", new IntType()));
         parameterList_substring.add(new DefinedVariable("right", new IntType()));
         stringEntity.defineMemberFunction(new DefinedFunction("substring", new StringType(),
-                parameterList_substring));
+                parameterList_substring, true));
         stringEntity.defineMemberFunction(new DefinedFunction("parseInt", new IntType(),
-                new ArrayList<>()));
+                new ArrayList<>(), true));
         List<DefinedVariable> parameterList_ord = new ArrayList<>();
         parameterList_ord.add(new DefinedVariable("pos", new IntType()));
         stringEntity.defineMemberFunction(new DefinedFunction("ord", new IntType(),
-                parameterList_ord));
+                parameterList_ord, true));
         typeTable.put("string", stringEntity);
         StringType.setEntity(stringEntity);
 
         DefinedClass arrayEntity = new DefinedClass("$$array_type_entity$$", new ArrayType(null, -1),
                 new LocalScope(globalScope));
-        arrayEntity.defineMemberFunction(new DefinedFunction("size", new IntType(), new ArrayList<>()));
+        arrayEntity.defineMemberFunction(new DefinedFunction("size", new IntType(), new ArrayList<>(), true));
         typeTable.put("$$array_type_entity$$", arrayEntity);
         ArrayType.setEntity(arrayEntity);
     }

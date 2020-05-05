@@ -38,23 +38,7 @@ public class Main {
         new ClassMemberScanner(globalScope).visit(programNode);
         new EntityBuilder(globalScope).visit(programNode);
         new SemanticChecker(globalScope).visit(programNode);
-
-        /*
-        try {
-            ProgramNode programNode = buildASTTree(in);
-
-            TopLevelScope globalScope = new TopLevelScope();
-            new ClassDeclScanner(globalScope).visit(programNode);
-            new BuiltinFunctionInitializer(globalScope).initialize();
-            new GlobalFuncDeclScanner(globalScope).visit(programNode);
-            new GlobalFuncDeclScanner(globalScope).visit(programNode);
-            new ClassMemberScanner(globalScope).visit(programNode);
-            new EntityBuilder(globalScope).visit(programNode);
-            new SemanticChecker(globalScope).visit(programNode);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        */
+        new IRBuilder(globalScope).visit(programNode);
     }
 
 
