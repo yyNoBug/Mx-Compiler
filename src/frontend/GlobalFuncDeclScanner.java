@@ -3,7 +3,6 @@ package frontend;
 import ast.*;
 import scope.DefinedFunction;
 import scope.TopLevelScope;
-import type.Type;
 
 public class GlobalFuncDeclScanner implements ASTVisitor {
     private TopLevelScope globalScope;
@@ -25,9 +24,9 @@ public class GlobalFuncDeclScanner implements ASTVisitor {
 
     @Override
     public void visit(FunDeclNode node) {
-        Type returnType = node.getType().getType();
         DefinedFunction function = new DefinedFunction(node, globalScope);
         globalScope.defineFunction(function);
+        node.setEntity(function);
     }
 
     @Override

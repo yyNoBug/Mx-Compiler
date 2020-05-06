@@ -2,9 +2,9 @@ package ir;
 
 import java.util.ArrayList;
 
-public class Function {
-    private String name;
-    private ArrayList<Block> blockList = new ArrayList<>();
+abstract public class Function {
+    protected String name;
+    protected ArrayList<Block> blockList = new ArrayList<>();
 
     public Function(String name) {
         this.name = name;
@@ -14,6 +14,10 @@ public class Function {
         blockList.add(thenBlock);
     }
 
+    public ArrayList<Block> getBlockList() {
+        return blockList;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -21,6 +25,7 @@ public class Function {
 
     public void printIR() {
         for (Block block : blockList) {
+            System.out.println("fun " + name + "()");
             block.printIR();
         }
     }

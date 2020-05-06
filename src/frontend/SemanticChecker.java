@@ -157,9 +157,17 @@ public class SemanticChecker implements ASTVisitor {
         if (function == null)
             throw new SemanticException(functionNameNode.getLocation(), "Not a function.");
         node.getParameterList().forEach(x -> x.accept(this));
-        if (node.getParameterList().size() == functionNameNode.getFuncEntity().getParameters().size()) {
+        int a = node.getParameterList().size();
+        int b = functionNameNode.getFuncEntity().getParameters().size();
+        if (function.isMemberFunction()) ++a;
+        if (a == b) {
             Iterator<ExprNode> iterator = node.getParameterList().iterator();
+            boolean flag = true;
             for (DefinedVariable parameter : function.getParameters()) {
+                if (function.isMemberFunction() && flag) {
+                    flag = false;
+                    continue;
+                }
                 ExprNode expr = iterator.next();
                 if (!parameter.getType().compacts(expr.getType()))
                     throw new SemanticException(node.getLocation(), "Parameter type not match.");

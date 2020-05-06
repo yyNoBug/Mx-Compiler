@@ -13,6 +13,6 @@ public class BranchStmt extends TerminalStmt {
 
     @Override
     public String toString() {
-        return "branch " + condition + " true -> " + thenBlock + " false -> " + elseBlock;
+        return "branch " + condition + " (true -> " + thenBlock + ") (false -> " + elseBlock + ")";
     }
 }

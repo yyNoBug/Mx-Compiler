@@ -10,11 +10,16 @@ public class Block {
         this.name = name;
     }
 
+    public ArrayList<Statement> getStmtList() {
+        return stmtList;
+    }
+
     public void add (Statement stmt) {
         stmtList.add(stmt);
     }
 
     public Statement peak() {
+        if (stmtList.size() == 0) return null;
         return stmtList.get(stmtList.size() - 1);
     }
 

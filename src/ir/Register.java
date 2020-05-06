@@ -7,6 +7,10 @@ abstract public class Register {
         this.name = name;
     }
 
+    public int getNum() {
+        return 0;
+    }
+
     @Override
     public String toString() {
         return name;

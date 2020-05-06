@@ -9,6 +9,6 @@ public class AllocateStmt extends YyStmt {
 
     @Override
     public String toString() {
-        return "allocate " + item;
+        return item + " = allocate";
     }
 }

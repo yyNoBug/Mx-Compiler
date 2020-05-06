@@ -44,6 +44,7 @@ public class ClassMemberScanner implements ASTVisitor {
         DefinedFunction function = new DefinedFunction(node, currentScope(), true);
         currentScope().defineFunction(function);
         curClass.defineMemberFunction(function);
+        node.setEntity(function);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class ClassMemberScanner implements ASTVisitor {
     public void visit(ClassConstructorNode node) {
         if (!curClass.getName().equals(node.getName()))
             throw new SemanticException("Constructor must have same name with its class.");
-        DefinedFunction constructor = new DefinedFunction(node, currentScope());
+        DefinedFunction constructor = new DefinedFunction(node, currentScope(), true);
         currentScope().defineFunction(constructor);
         curClass.defineConstructor(constructor);
     }
