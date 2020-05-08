@@ -1,9 +1,9 @@
 package ir;
 
 public class StoreStmt extends YyStmt {
-    private Register src, dest;
+    private Item src, dest;
 
-    public StoreStmt(Register src, Register dest) {
+    public StoreStmt(Item src, Item dest) {
         this.src = src;
         this.dest = dest;
     }

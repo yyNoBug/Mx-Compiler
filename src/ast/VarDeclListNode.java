@@ -22,6 +22,7 @@ public class VarDeclListNode extends ASTNode {
 
     @Override
     public void accept(ASTVisitor visitor) {
-        System.out.println("How can that be ???");
+        System.err.println("How can that be ???");
+        assert false;
     }
 }

@@ -1,6 +1,6 @@
 package ir;
 
-public class NumConst extends Register {
+public class NumConst extends Item {
     private int value;
 
     public NumConst(int value) {

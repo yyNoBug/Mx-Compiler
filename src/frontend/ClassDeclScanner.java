@@ -27,7 +27,7 @@ public class ClassDeclScanner implements ASTVisitor {
 
     @Override
     public void visit(ClassDeclNode node) {
-        globalScope.defineClass(node.getId());
+        globalScope.defineClass(node);
     }
 
     @Override

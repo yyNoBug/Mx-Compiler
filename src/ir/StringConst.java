@@ -1,6 +1,6 @@
 package ir;
 
-public class StringConst extends Register {
+public class StringConst extends Item {
     private String str;
 
     static private int stringCount = 0;

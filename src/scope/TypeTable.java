@@ -1,5 +1,6 @@
 package scope;
 
+import ast.ClassDeclNode;
 import type.*;
 
 import java.util.ArrayList;
@@ -57,11 +58,13 @@ public class TypeTable {
         ArrayType.setEntity(arrayEntity);
     }
 
-    public void defineClass(String className) throws SemanticException {
+    public void defineClass(ClassDeclNode node) throws SemanticException {
+        String className = node.getId();
         if (typeTable.containsKey(className)) throw new SemanticException("Class " + className + " has been defined.");
         DefinedClass entity = new DefinedClass(className, new ClassType(className), new LocalScope(globalScope));
         ((ClassType) entity.getType()).setEntity(entity);
         typeTable.put(className, entity);
+        node.setEntity(entity);
     }
 
     public DefinedClass getClass(String name) {

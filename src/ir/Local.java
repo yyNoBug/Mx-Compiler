@@ -1,6 +1,6 @@
 package ir;
 
-public class Local extends Register {
+public class Local extends Item {
     static private int localCount = 0;
     private int num;
 

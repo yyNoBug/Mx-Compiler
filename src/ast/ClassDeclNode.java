@@ -1,5 +1,7 @@
 package ast;
 
+import scope.DefinedClass;
+
 import java.util.List;
 
 public class ClassDeclNode extends DeclarationNode {
@@ -7,6 +9,7 @@ public class ClassDeclNode extends DeclarationNode {
     private List<VarDeclSingleNode> membersVars;
     private List<FunDeclNode> memberFuns;
     private ClassConstructorNode constructor;
+    private DefinedClass entity;
 
     public ClassDeclNode(Location loc, String id, List<VarDeclSingleNode> membersVars, List<FunDeclNode> memberFuns,
                          ClassConstructorNode constructor) {
@@ -31,6 +34,14 @@ public class ClassDeclNode extends DeclarationNode {
 
     public ClassConstructorNode getConstructor() {
         return constructor;
+    }
+
+    public DefinedClass getEntity() {
+        return entity;
+    }
+
+    public void setEntity(DefinedClass entity) {
+        this.entity = entity;
     }
 
     @Override

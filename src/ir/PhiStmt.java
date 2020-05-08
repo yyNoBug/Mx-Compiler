@@ -4,9 +4,9 @@ import java.util.Map;
 
 public class PhiStmt extends Statement {
     private Local target;
-    private Map<Block, Register> map;
+    private Map<Block, Item> map;
 
-    public PhiStmt(Local target, Map<Block, Register> map) {
+    public PhiStmt(Local target, Map<Block, Item> map) {
         this.target = target;
         this.map = map;
     }

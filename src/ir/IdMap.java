@@ -6,13 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class IdMap {
-    private Map<Entity, Register> map = new LinkedHashMap<>();
+    private Map<Entity, Item> map = new LinkedHashMap<>();
 
-    public void put(Entity entity, Register reg) {
-        map.put(entity, reg);
+    public void put(Entity entity, Item item) {
+        map.put(entity, item);
     }
 
-    public Register get(Entity entity) {
+    public Item get(Entity entity) {
         return map.get(entity);
     }
 }

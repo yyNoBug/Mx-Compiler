@@ -14,6 +14,8 @@ public class VarDeclStatementNode extends StatementNode {
 
     @Override
     public void accept(ASTVisitor visitor) {
+        // I assert the declaration is completely useless.
         visitor.visit(this);
+        // System.err.println("How can that be ???");
     }
 }

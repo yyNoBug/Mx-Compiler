@@ -3,17 +3,17 @@ package ir;
 import java.util.ArrayList;
 
 public class DeclaredFunction extends Function {
-    private ArrayList<Register> args = new ArrayList<>();
+    private ArrayList<Item> args = new ArrayList<>();
 
     public DeclaredFunction(String name) {
         super(name);
     }
 
-    public void defineArg(Register reg){
+    public void defineArg(Item reg){
         args.add(reg);
     }
 
-    public ArrayList<Register> getArgs() {
+    public ArrayList<Item> getArgs() {
         return args;
     }
 
@@ -21,7 +21,7 @@ public class DeclaredFunction extends Function {
     public void printIR() {
         StringBuilder str = new StringBuilder("fun " + name + "(");
         boolean flag = false;
-        for (Register parameter : args) {
+        for (Item parameter : args) {
             if (flag) str.append(" ,");
             str.append(parameter);
             flag = true;

@@ -66,6 +66,7 @@ public class ClassMemberScanner implements ASTVisitor {
         DefinedFunction constructor = new DefinedFunction(node, currentScope(), true);
         currentScope().defineFunction(constructor);
         curClass.defineConstructor(constructor);
+        node.setEntity(constructor);
     }
 
     @Override

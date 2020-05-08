@@ -1,9 +1,9 @@
 package ir;
 
 public class AllocateStmt extends YyStmt {
-    private Register item;
+    private Item item;
 
-    public AllocateStmt(Register item) {
+    public AllocateStmt(Item item) {
         this.item = item;
     }
 

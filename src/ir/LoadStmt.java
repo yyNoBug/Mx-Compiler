@@ -1,10 +1,10 @@
 package ir;
 
 public class LoadStmt extends YyStmt {
-    private Register src;
-    private Register dest;
+    private Item src;
+    private Item dest;
 
-    public LoadStmt(Register src, Register dest) {
+    public LoadStmt(Item src, Item dest) {
         this.src = src;
         this.dest = dest;
     }

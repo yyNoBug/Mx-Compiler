@@ -1,6 +1,7 @@
 package scope;
 
 
+import ast.ClassDeclNode;
 import type.FuncType;
 import type.IntType;
 
@@ -15,8 +16,8 @@ public class TopLevelScope extends Scope {
         this.typeTable = new TypeTable(this);
     }
 
-    public void defineClass(String className) throws SemanticException {
-        typeTable.defineClass(className);
+    public void defineClass(ClassDeclNode node) throws SemanticException {
+        typeTable.defineClass(node);
     }
 
     public void defineFunction(DefinedFunction function) {

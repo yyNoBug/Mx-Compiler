@@ -39,6 +39,7 @@ public class DefinedFunction extends Entity {
         parameters = new ArrayList<>();
         for (VarDeclSingleNode varDeclSingleNode : node.getParameterList()) {
             DefinedVariable var = new DefinedVariable(varDeclSingleNode);
+            varDeclSingleNode.setEntity(var);
             parameters.add(var);
             innerScope.defineVariable(var);
         }
@@ -54,6 +55,7 @@ public class DefinedFunction extends Entity {
         innerScope.defineVariable(thisPointer);
         for (VarDeclSingleNode varDeclSingleNode : node.getParameterList()) {
             DefinedVariable var = new DefinedVariable(varDeclSingleNode);
+            varDeclSingleNode.setEntity(var);
             parameters.add(var);
             innerScope.defineVariable(var);
         }

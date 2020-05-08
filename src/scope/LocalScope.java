@@ -20,13 +20,13 @@ public class LocalScope extends Scope {
 
     public void defineFunction(DefinedFunction function) {
         if (entities.containsKey(function.getName()))
-            throw new SemanticException("Name " + function.getName() + "has been defined.");
+            throw new SemanticException("Name " + function.getName() + " has been defined.");
         entities.put(function.getName(), function);
     }
 
     public void defineVariable(DefinedVariable var) {
         if (entities.containsKey(var.getName()))
-            throw new SemanticException("Name " + var.getName() + "has been defined.");
+            throw new SemanticException("Name " + var.getName() + " has been defined.");
         entities.put(var.getName(), var);
     }
 }

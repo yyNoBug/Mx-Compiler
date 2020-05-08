@@ -2,9 +2,11 @@ package frontend;
 
 import ast.*;
 import ir.*;
+import scope.DefinedClass;
 import scope.DefinedVariable;
 import scope.TopLevelScope;
 import type.ClassType;
+import type.StringType;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -15,8 +17,9 @@ public class IRBuilder implements ASTVisitor {
 
     private DeclaredFunction curFunction;
     private Block curBlock;
-    private Register curReg;
-    private String curClassName;
+    private Item curReg;
+    private DefinedClass curClassEntity;
+    private Local curThisPointer;
     private Stack<Boolean> leftValueRequireStack = new Stack<>();
     private boolean isVisitingGlobalVariable;
     private boolean isVisitingParameter;
@@ -57,8 +60,9 @@ public class IRBuilder implements ASTVisitor {
         isVisitingGlobalVariable = false;
         for (DeclarationNode declarationNode : node.getSection_list()) {
             if (!(declarationNode instanceof VarDeclSingleNode)) {
-                if (declarationNode instanceof ClassDeclNode) curClassName = ((ClassDeclNode) declarationNode).getId();
-                else curClassName = null;
+                if (declarationNode instanceof ClassDeclNode)
+                    curClassEntity = ((ClassDeclNode) declarationNode).getEntity();
+                else curClassEntity = null;
                 declarationNode.accept(this);
             }
         }
@@ -91,8 +95,8 @@ public class IRBuilder implements ASTVisitor {
     public void visit(FunDeclNode node) {
         if (isVisitingGlobalVariable) {
             String name;
-            if (curClassName == null) name = node.getName();
-            else name = curClassName + "." + node.getName();
+            if (curClassEntity == null) name = node.getName();
+            else name = curClassEntity.getName() + "." + node.getName();
             curFunction = new DeclaredFunction(name);
             declaredFunctions.add(curFunction);
             functionMap.put(node.getEntity(), curFunction);
@@ -117,6 +121,14 @@ public class IRBuilder implements ASTVisitor {
         }
 
         enterBlock(entry);
+        if (curClassEntity != null) {
+            var thisPointerEntity = node.getEntity().getParameters().get(0);
+            Local local = new Local();
+            // idMap.put(thisPointerEntity, local);
+            curThisPointer = local;
+            curBlock.add(new AllocateStmt(local));
+            curFunction.defineArg(local);
+        }
         isVisitingParameter = true;
         node.getParameterList().forEach(x -> x.accept(this));
         isVisitingParameter = false;
@@ -129,7 +141,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ClassDeclNode node) {
-        if(node.getConstructor() != null) node.getConstructor().accept(this);
+        if (node.getConstructor() != null) node.getConstructor().accept(this);
         // node.getMemberVars().forEach(x->x.accept(this));
         node.getMemberFuns().forEach(x->x.accept(this));
     }
@@ -145,6 +157,13 @@ public class IRBuilder implements ASTVisitor {
 
         curFunction = ((DeclaredFunction) functionMap.get(node.getEntity()));
         enterBlock(new Block("entry"));
+
+        var thisPointerEntity = node.getEntity().getParameters().get(0);
+        Local local = new Local();
+        //idMap.put(thisPointerEntity, local);
+        curThisPointer = local;
+        curBlock.add(new AllocateStmt(local));
+        curFunction.defineArg(local);
 
         isVisitingParameter = true;
         node.getParameterList().forEach(x -> x.accept(this));
@@ -164,11 +183,6 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(ExprStatementNode node) {
         node.getExpression().accept(this);
-    }
-
-    @Override
-    public void visit(VarDeclStatementNode node) {
-        node.getVariable().accept(this);
     }
 
     private int ifCount = 0;
@@ -276,12 +290,16 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(FunCallExprNode node) {
         Function function = functionMap.get(node.getFuncExpr().getFuncEntity());
-        ArrayList<Register> parameters = new ArrayList<>();
+        ArrayList<Item> parameters = new ArrayList<>();
         if (node.getFuncExpr().getFuncEntity().isMemberFunction()) {
-            leftValueRequireStack.add(false);
-            node.getFuncExpr().accept(this);
-            leftValueRequireStack.pop();
-            parameters.add(curReg);
+            if (curClassEntity == null) {
+                leftValueRequireStack.add(false);
+                node.getFuncExpr().accept(this);
+                leftValueRequireStack.pop();
+                parameters.add(curReg);
+            } else {
+
+            }
         }
         node.getParameterList().forEach(x -> {
             leftValueRequireStack.add(false);
@@ -299,12 +317,12 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getArray().accept(this);
         leftValueRequireStack.pop();
-        Register base = curReg;
+        Item base = curReg;
 
         leftValueRequireStack.push(false);
         node.getIndex().accept(this);
         leftValueRequireStack.pop();
-        Register ind = curReg;
+        Item ind = curReg;
         Local offset = new Local();
         curBlock.add(new OpStmt(OpStmt.Op.MUL, ind, new NumConst(node.getArray().getType().getEntity().getClassSize()), offset));
 
@@ -318,15 +336,17 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.add(false);
         node.getExpr().accept(this);
         leftValueRequireStack.pop();
-        Register parent = curReg;
-        Local ret = new Local();
+        Item parent = curReg;
+        Item ret;
         if (node.getFuncEntity() != null) {
-            curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, new NumConst(0), ret));
+            ret = parent;
+            // curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, new NumConst(0), ret));
         } else {
-            Register offset = new NumConst(node.getExpr().getType().getEntity().calOffset(node.getMember()) * 4);
+            Item offset = new NumConst(node.getExpr().getType().getEntity().calOffset(node.getMember()) * 4);
+            ret = new Local();
             curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, offset, ret));
-            curReg = ret;
         }
+        curReg = ret;
     }
 
     @Override
@@ -334,7 +354,7 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getExpr().accept(this);
         leftValueRequireStack.pop();
-        Register item = curReg;
+        Item item = curReg;
 
         Local ret = new Local();
         switch (node.getOp()){
@@ -365,7 +385,7 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getExpr().accept(this);
         leftValueRequireStack.pop();
-        Register item = curReg;
+        Item item = curReg;
 
         Local ret = new Local();
         switch (node.getOp()) {
@@ -379,7 +399,7 @@ public class IRBuilder implements ASTVisitor {
         curReg = ret;
     }
 
-    private void ConstructNewArray(Stack<Register> dims, Register base, int current) {
+    private void ConstructNewArray(Stack<Item> dims, Item base, int current) {
         if (current == dims.size()) return;
         int id = arrayBlockCount++;
         var cond = new Block("array." + id + ".cond");
@@ -405,7 +425,7 @@ public class IRBuilder implements ASTVisitor {
 
         enterBlock(body);
         var cur = new Local();
-        var parameters = new ArrayList<Register>();
+        var parameters = new ArrayList<Item>();
         parameters.add(dims.get(current));
         curBlock.add(new CallStmt(BuiltinFunction.mallocArray, parameters, cur));
         curBlock.add(new StoreStmt(cur, location));
@@ -423,14 +443,14 @@ public class IRBuilder implements ASTVisitor {
     public void visit(NewExprNode node) {
         var ret = new Local();
         if (node.getNumDims() != 0) {
-            Stack<Register> dims = new Stack<>();
+            Stack<Item> dims = new Stack<>();
             node.getDims().forEach(x -> {
                 leftValueRequireStack.push(false);
                 x.accept(this);
                 leftValueRequireStack.pop();
                 dims.push(curReg);
             });
-            var parameters = new ArrayList<Register>();
+            var parameters = new ArrayList<Item>();
             parameters.add(dims.get(0));
             curBlock.add(new CallStmt(BuiltinFunction.mallocArray, parameters, ret));
             ConstructNewArray(dims, ret, 1);
@@ -438,13 +458,13 @@ public class IRBuilder implements ASTVisitor {
             int typeSize;
             if (!(node.getNewType().getType() instanceof ClassType)) typeSize = 4;
             else typeSize = node.getNewType().getType().getEntity().getClassSize();
-            var parameters_1 = new ArrayList<Register>();
+            var parameters_1 = new ArrayList<Item>();
             parameters_1.add(new NumConst(typeSize));
             curBlock.add(new CallStmt(BuiltinFunction.mallocObject, parameters_1, ret));
             if (node.getNewType().getType() instanceof ClassType) {
                 var constructor = node.getNewType().getType().getEntity().getConstructor();
                 if (constructor != null) {
-                    var parameters_2 = new ArrayList<Register>();
+                    var parameters_2 = new ArrayList<Item>();
                     parameters_2.add(ret);
                     curBlock.add(new CallStmt(functionMap.get(constructor), parameters_2, null));
                 }
@@ -459,7 +479,7 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getLhs().accept(this);
         leftValueRequireStack.pop();
-        Register lhs = curReg;
+        Item lhs = curReg;
 
         if (node.getOp() == BinaryExprNode.Op.LOGIC_AND || node.getOp() == BinaryExprNode.Op.LOGIC_OR) {
             Block first = curBlock;
@@ -475,7 +495,7 @@ public class IRBuilder implements ASTVisitor {
             leftValueRequireStack.push(false);
             node.getRhs().accept(this);
             leftValueRequireStack.pop();
-            Register rhs = curReg;
+            Item rhs = curReg;
             curBlock.add(new JmpStmt(end));
 
             enterBlock(end);
@@ -492,29 +512,77 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getRhs().accept(this);
         leftValueRequireStack.pop();
-        Register rhs = curReg;
+        Item rhs = curReg;
         Local ret = new Local();
         switch(node.getOp()){
             case EQ:
-                curBlock.add(new OpStmt(OpStmt.Op.EQ, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringEqual, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.EQ, lhs, rhs, ret));
+                }
                 break;
             case NEQ:
-                curBlock.add(new OpStmt(OpStmt.Op.NEQ, lhs, rhs, ret));
-                break;
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringNeq, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.NEQ, lhs, rhs, ret));
+                }
             case LEQ:
-                curBlock.add(new OpStmt(OpStmt.Op.LEQ, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringLeq, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.LEQ, lhs, rhs, ret));
+                }
                 break;
             case LTH:
-                curBlock.add(new OpStmt(OpStmt.Op.LTH, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringLess, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.LTH, lhs, rhs, ret));
+                }
                 break;
             case GEQ:
-                curBlock.add(new OpStmt(OpStmt.Op.GEQ, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringGeq, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.GEQ, lhs, rhs, ret));
+                }
                 break;
             case GTH:
-                curBlock.add(new OpStmt(OpStmt.Op.GTH, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringGreater, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.GEQ, lhs, rhs, ret));
+                }
                 break;
             case ADD:
-                curBlock.add(new OpStmt(OpStmt.Op.PLUS, lhs, rhs, ret));
+                if (node.getLhs().getType() instanceof StringType) {
+                    var para = new ArrayList<Item>();
+                    para.add(lhs);
+                    para.add(rhs);
+                    curBlock.add(new CallStmt(BuiltinFunction.stringConcatenate, para, ret));
+                } else {
+                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, lhs, rhs, ret));
+                }
                 break;
             case SUB:
                 curBlock.add(new OpStmt(OpStmt.Op.MINUS, lhs, rhs, ret));
@@ -552,12 +620,12 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(true);
         node.getLhs().accept(this);
         leftValueRequireStack.pop();
-        Register lhs = curReg;
+        Item lhs = curReg;
 
         leftValueRequireStack.push(false);
         node.getRhs().accept(this);
         leftValueRequireStack.pop();
-        Register rhs = curReg;
+        Item rhs = curReg;
 
         curBlock.add(new StoreStmt(rhs, lhs));
     }
@@ -565,9 +633,15 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(IdExprNode node) {
         if (node.getFuncEntity() == null) {
-            Register ret;
+            Item ret;
             if (leftValueRequireStack.peek()) {
                 ret = idMap.get(node.getEntity());
+                if (ret == null) {
+                    Local t = curThisPointer;
+                    Item offset = new NumConst(curClassEntity.calOffset(node.getId()) * 4);
+                    ret = new Local();
+                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, curThisPointer, offset, ret));
+                }
             } else {
                 ret = new Local();
                 curBlock.add(new LoadStmt(idMap.get(node.getEntity()), ret));
@@ -581,7 +655,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ThisExprNode node) {
-        curReg = idMap.get(node.getEntity());
+        curReg = curThisPointer;
     }
 
     @Override
@@ -614,6 +688,11 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ArrayTypeNode node) {
+        // Need do nothing.
+    }
+
+    @Override
+    public void visit(VarDeclStatementNode node) {
         // Need do nothing.
     }
 }

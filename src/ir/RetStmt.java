@@ -1,14 +1,14 @@
 package ir;
 
 public class RetStmt extends TerminalStmt {
-    private Register register;
+    private Item item;
 
-    public RetStmt(Register register) {
-        this.register = register;
+    public RetStmt(Item item) {
+        this.item = item;
     }
 
     @Override
     public String toString() {
-        return "return " + register;
+        return "return " + item;
     }
 }

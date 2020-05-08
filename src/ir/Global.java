@@ -1,6 +1,6 @@
 package ir;
 
-public class Global extends Register {
+public class Global extends Item {
     static private int globalCount = 0;
     private int num;
 
