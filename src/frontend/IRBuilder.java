@@ -75,10 +75,19 @@ public class IRBuilder implements ASTVisitor {
             idMap.put(node.getEntity(), global);
             globalMap.add(node.getEntity(), node.getExpr());
         } else {
+            if (isVisitingParameter) {
+                Local parameterValue = new Local();
+                curFunction.defineArg(parameterValue);
+                Local local = new Local();
+                idMap.put(node.getEntity(), local);
+                curBlock.add(new AllocateStmt(local));
+                curBlock.add(new StoreStmt(parameterValue, local));
+                return;
+            }
+
             Local local = new Local();
             idMap.put(node.getEntity(), local);
             curBlock.add(new AllocateStmt(local));
-            if (isVisitingParameter) curFunction.defineArg(local);
 
             if (node.getExpr() != null) {
                 leftValueRequireStack.push(false);
@@ -122,12 +131,12 @@ public class IRBuilder implements ASTVisitor {
 
         enterBlock(entry);
         if (curClassEntity != null) {
-            var thisPointerEntity = node.getEntity().getParameters().get(0);
+            Local parameterValue = new Local();
+            curFunction.defineArg(parameterValue);
             Local local = new Local();
-            // idMap.put(thisPointerEntity, local);
             curThisPointer = local;
             curBlock.add(new AllocateStmt(local));
-            curFunction.defineArg(local);
+            curBlock.add(new StoreStmt(parameterValue, local));
         }
         isVisitingParameter = true;
         node.getParameterList().forEach(x -> x.accept(this));
@@ -158,12 +167,12 @@ public class IRBuilder implements ASTVisitor {
         curFunction = ((DeclaredFunction) functionMap.get(node.getEntity()));
         enterBlock(new Block("entry"));
 
-        var thisPointerEntity = node.getEntity().getParameters().get(0);
+        Local parameterValue = new Local();
+        curFunction.defineArg(parameterValue);
         Local local = new Local();
-        //idMap.put(thisPointerEntity, local);
         curThisPointer = local;
         curBlock.add(new AllocateStmt(local));
-        curFunction.defineArg(local);
+        curBlock.add(new StoreStmt(parameterValue, local));
 
         isVisitingParameter = true;
         node.getParameterList().forEach(x -> x.accept(this));

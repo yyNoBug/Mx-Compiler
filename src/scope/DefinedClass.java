@@ -55,6 +55,6 @@ public class DefinedClass extends Entity {
     }
 
     public int getClassSize() {
-        return (varCounter + 1) * 4;
+        return varCounter * 4;
     }
 }
