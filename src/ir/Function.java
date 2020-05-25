@@ -18,6 +18,10 @@ abstract public class Function {
         return blockList;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         return name;

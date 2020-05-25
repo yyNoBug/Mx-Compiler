@@ -1,5 +1,6 @@
 package ir;
 
+import ir.maps.FunctionMap;
 import scope.DefinedFunction;
 import scope.TopLevelScope;
 

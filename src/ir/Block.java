@@ -1,5 +1,7 @@
 package ir;
 
+import ir.irStmt.Statement;
+
 import java.util.ArrayList;
 
 public class Block {
@@ -12,6 +14,10 @@ public class Block {
 
     public ArrayList<Statement> getStmtList() {
         return stmtList;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void add (Statement stmt) {

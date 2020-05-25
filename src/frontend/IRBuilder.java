@@ -1,7 +1,16 @@
 package frontend;
 
 import ast.*;
-import ir.*;
+import ir.Block;
+import ir.BuiltinFunction;
+import ir.DeclaredFunction;
+import ir.Function;
+import ir.irStmt.*;
+import ir.items.*;
+import ir.maps.FunctionMap;
+import ir.maps.GlobalMap;
+import ir.maps.IdMap;
+import ir.maps.LoopMap;
 import scope.DefinedClass;
 import scope.DefinedVariable;
 import scope.TopLevelScope;
@@ -229,7 +238,7 @@ public class IRBuilder implements ASTVisitor {
         Block conditionBlock = new Block("while." + whileCount + ".condition");
         Block bodyBlock = new Block("while." + whileCount + ".body");
         Block endBlock = new Block("while." + whileCount + ".end");
-        whileCount++;
+        loopMap.put(node, conditionBlock, endBlock);
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(conditionBlock);
@@ -243,7 +252,7 @@ public class IRBuilder implements ASTVisitor {
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(endBlock);
-        loopMap.put(node, conditionBlock, endBlock);
+        whileCount++;
     }
 
     private int forCount = 0;
@@ -254,6 +263,7 @@ public class IRBuilder implements ASTVisitor {
         Block bodyBlock = new Block("for." + forCount + ".body");
         Block stepBlock = new Block("for." + forCount + ".step");
         Block endBlock = new Block("for." + forCount + ".end");
+        loopMap.put(node, conditionBlock, endBlock);
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(conditionBlock);
@@ -272,7 +282,6 @@ public class IRBuilder implements ASTVisitor {
 
         enterBlock(endBlock);
         forCount++;
-        loopMap.put(node, conditionBlock, endBlock);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package ir;
 
+import ir.items.Item;
+
 import java.util.ArrayList;
 
 public class DeclaredFunction extends Function {
