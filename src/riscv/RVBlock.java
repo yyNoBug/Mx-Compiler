@@ -27,7 +27,8 @@ public class RVBlock {
     }
 
     public void printRV(){
-        System.out.println(name + ":");
+        if (!name.equals("__invisible__"))
+            System.out.println(name + ":");
         for (Instruction instruction : instructions) {
             System.out.println(instruction);
         }

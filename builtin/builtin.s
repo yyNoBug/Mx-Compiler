@@ -292,24 +292,24 @@ __stringSubstring__:
 	.type	__stringConcatenate__, @function
 __stringConcatenate__:
 	addi	sp,sp,-32
-	lw	a5,0(a1)
-	sw	s0,24(sp)
-	lw	s0,0(a0)
-	sw	s3,12(sp)
-	mv	s3,a0
-	add	s0,s0,a5
-	addi	a0,s0,5
-	sw	s1,20(sp)
-	sw	s2,16(sp)
 	sw	s4,8(sp)
+	sw	s5,4(sp)
+	lw	s4,0(a0)
+	lw	s5,0(a1)
+	sw	s1,20(sp)
+	sw	s3,12(sp)
+	add	s1,s4,s5
+	mv	s3,a0
+	addi	a0,s1,5
+	sw	s0,24(sp)
+	sw	s2,16(sp)
 	sw	ra,28(sp)
 	mv	s2,a1
 	call	malloc
-	lw	s4,0(s3)
-	sw	s0,0(a0)
-	add	s0,a0,s0
-	sb	zero,4(s0)
-	mv	s1,a0
+	sw	s1,0(a0)
+	add	s1,a0,s1
+	sb	zero,4(s1)
+	mv	s0,a0
 	addi	a5,a0,4
 	ble	s4,zero,.L36
 	mv	a0,a5
@@ -318,19 +318,20 @@ __stringConcatenate__:
 	call	memcpy
 	add	a5,a0,s4
 .L36:
-	lw	a2,0(s2)
-	ble	a2,zero,.L35
+	ble	s5,zero,.L35
+	mv	a2,s5
 	addi	a1,s2,4
 	mv	a0,a5
 	call	memcpy
 .L35:
 	lw	ra,28(sp)
+	mv	a0,s0
 	lw	s0,24(sp)
+	lw	s1,20(sp)
 	lw	s2,16(sp)
 	lw	s3,12(sp)
 	lw	s4,8(sp)
-	mv	a0,s1
-	lw	s1,20(sp)
+	lw	s5,4(sp)
 	addi	sp,sp,32
 	jr	ra
 	.size	__stringConcatenate__, .-__stringConcatenate__

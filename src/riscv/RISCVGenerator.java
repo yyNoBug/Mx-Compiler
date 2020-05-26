@@ -39,26 +39,32 @@ public class RISCVGenerator implements IRVisitor {
     private void dealGlobal(Global global){
         curBlock = new RVBlock(global.toString());
         curFunction.add(curBlock);
-        curBlock.add(new DirSECTION(".data"));
         curBlock.add(new DirZERO(4));
     }
 
     private void dealStr(StringConst str){
-        curBlock = new RVBlock(str.toString());
+        curBlock = new RVBlock("string" + str.getNum());
         curFunction.add(curBlock);
-        curBlock.add(new DirSECTION(".rodata"));
+        curBlock.add(new DirWORD(str.getStr().length()));
         curBlock.add(new DirSTRING(str.getStr()));
     }
 
     public void generateRVAssembly() {
         curFunction = new RVFunction("__program_begin__");
         rvTop.add(curFunction);
+        curBlock = new RVBlock("__invisible__");
+        curFunction.add(curBlock);
 
+        curBlock.add(new DirSECTION(".data"));
         var globals = irTop.getGlobals();
         globals.forEach(x -> dealGlobal(x));
 
+        curBlock.add(new DirSECTION(".rodata"));
         var strs = irTop.getStrs();
         strs.forEach(x -> dealStr(x));
+
+        curBlock.add(new DirSECTION("text"));
+        curBlock.add(new DirGLOBL("main"));
 
         var declaredFunctions = irTop.getFunctions();
         isPreScanning = true;
