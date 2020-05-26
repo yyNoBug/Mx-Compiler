@@ -48,7 +48,7 @@ public class IRBuilder implements ASTVisitor {
         System.out.println();
 
         for (StringConst str : top.getStrs()) {
-            System.out.println("string " + str + " = " + str.getStr());
+            System.out.println("string " + str + " = \"" + str.getStr() + "\"");
         }
 
         System.out.println();
@@ -231,14 +231,14 @@ public class IRBuilder implements ASTVisitor {
             curBlock.add(new BranchStmt(curReg, thenBlock, endBlock));
 
         enterBlock(thenBlock);
-        curBlock.add(new JmpStmt(endBlock));
         if (node.getThenStatement() != null)
             node.getThenStatement().accept(this);
+        curBlock.add(new JmpStmt(endBlock));
 
         enterBlock(elseBlock);
-        curBlock.add(new JmpStmt(endBlock));
         if (node.getElseStatement() != null)
             node.getElseStatement().accept(this);
+        curBlock.add(new JmpStmt(endBlock));
 
         enterBlock(endBlock);
     }
@@ -327,7 +327,7 @@ public class IRBuilder implements ASTVisitor {
                 leftValueRequireStack.pop();
                 parameters.add(curReg);
             } else {
-
+                //TODO
             }
         }
         node.getParameterList().forEach(x -> {
@@ -696,6 +696,7 @@ public class IRBuilder implements ASTVisitor {
     public void visit(StringConstNode node) {
         curReg = new StringConst(node.getStr());
         top.add(((StringConst) curReg));
+        System.out.println();
     }
 
     @Override

@@ -21,6 +21,6 @@ public class DirSTRING extends Instruction {
 
     @Override
     public String toString() {
-        return "\t.string\t" + str;
+        return "\t.string\t" + "\"" + str + "\"";
     }
 }

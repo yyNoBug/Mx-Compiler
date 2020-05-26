@@ -43,7 +43,7 @@ public class RISCVGenerator implements IRVisitor {
     }
 
     private void dealStr(StringConst str){
-        curBlock = new RVBlock("string" + str.getNum());
+        curBlock = new RVBlock("string" + str.getNumber());
         curFunction.add(curBlock);
         curBlock.add(new DirWORD(str.getStr().length()));
         curBlock.add(new DirSTRING(str.getStr()));
@@ -137,7 +137,7 @@ public class RISCVGenerator implements IRVisitor {
         var thenBlock = stmt.getThenBlock();
         var elseBlock = stmt.getElseBlock();
 
-        curBlock.add(new BEQZ(regMap.get(cond), blkMap.get(elseBlock)));
+        curBlock.add(new BEQZ(createReg(cond), blkMap.get(elseBlock)));
         curBlock.add(new J(blkMap.get(thenBlock)));
     }
 

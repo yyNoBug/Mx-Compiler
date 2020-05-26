@@ -149,7 +149,8 @@ public class ASTBuilder extends MxLangBaseVisitor<ASTNode> {
 
     private String unescape(String str, Location loc) {
         StringBuilder strBuilder = new StringBuilder();
-        for (int i = 0; i < str.length(); ++i) {
+        for (int i = 1; i < str.length() - 1; ++i) {
+        // Note: I deleted the double quotation mark here.
             if (i + 1 < str.length() && str.charAt(i) == '\\') {
                 switch (str.charAt(i + 1)) {
                     case '\\': strBuilder.append('\\'); break;
