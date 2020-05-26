@@ -1,6 +1,5 @@
 package riscv.instruction;
 
-import riscv.RVBlock;
 import riscv.RVFunction;
 import riscv.register.REGISTER;
 import riscv.register.VIRTUAL;
@@ -8,11 +7,11 @@ import riscv.register.VIRTUAL;
 import java.util.ListIterator;
 import java.util.Map;
 
-public class J extends Instruction {
-    private RVBlock dest;
+public class DirSTRING extends Instruction {
+    private String str;
 
-    public J(RVBlock dest) {
-        this.dest = dest;
+    public DirSTRING(String str) {
+        this.str = str;
     }
 
     @Override
@@ -22,6 +21,6 @@ public class J extends Instruction {
 
     @Override
     public String toString() {
-        return "\tj\t" + dest;
+        return "\t.string\t" + str;
     }
 }

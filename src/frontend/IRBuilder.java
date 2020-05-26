@@ -1,10 +1,7 @@
 package frontend;
 
 import ast.*;
-import ir.Block;
-import ir.BuiltinFunction;
-import ir.DeclaredFunction;
-import ir.Function;
+import ir.*;
 import ir.irStmt.*;
 import ir.items.*;
 import ir.maps.FunctionMap;
@@ -22,7 +19,7 @@ import java.util.Map;
 import java.util.Stack;
 
 public class IRBuilder implements ASTVisitor {
-    private ArrayList<DeclaredFunction> declaredFunctions = new ArrayList<>();
+    private IRTop top = new IRTop();
 
     private DeclaredFunction curFunction;
     private Block curBlock;
@@ -38,10 +35,6 @@ public class IRBuilder implements ASTVisitor {
     private LoopMap loopMap = new LoopMap();
     private FunctionMap functionMap = new FunctionMap();
 
-    private void enterBlock (Block block) {
-        curFunction.add(block);
-        curBlock = block;
-    }
 
     public IRBuilder(TopLevelScope globalScope) {
         BuiltinFunction.setFunctionMap(functionMap, globalScope);
@@ -49,14 +42,31 @@ public class IRBuilder implements ASTVisitor {
 
     public void printIR(){
         var map = globalMap.getGlobalList();
-        for (DefinedVariable definedVariable : map) {
-            System.out.println("global " + idMap.get(definedVariable));
+        for (Global global : top.getGlobals()) {
+            System.out.println("global " + global);
         }
         System.out.println();
+
+        for (StringConst str : top.getStrs()) {
+            System.out.println("string " + str + " = " + str.getStr());
+        }
+
+        System.out.println();
+
+        var declaredFunctions = top.getFunctions();
         for (DeclaredFunction function : declaredFunctions) {
             function.printIR();
             System.out.println();
         }
+    }
+
+    public IRTop getTop() {
+        return top;
+    }
+
+    private void enterBlock (Block block) {
+        curFunction.add(block);
+        curBlock = block;
     }
 
     @Override
@@ -81,6 +91,7 @@ public class IRBuilder implements ASTVisitor {
     public void visit(VarDeclSingleNode node) {
         if (isVisitingGlobalVariable) {
             Global global = new Global();
+            top.add(global);
             idMap.put(node.getEntity(), global);
             globalMap.add(node.getEntity(), node.getExpr());
         } else {
@@ -116,7 +127,7 @@ public class IRBuilder implements ASTVisitor {
             if (curClassEntity == null) name = node.getName();
             else name = curClassEntity.getName() + "." + node.getName();
             curFunction = new DeclaredFunction(name);
-            declaredFunctions.add(curFunction);
+            top.add(curFunction);
             functionMap.put(node.getEntity(), curFunction);
             return;
         }
@@ -168,7 +179,7 @@ public class IRBuilder implements ASTVisitor {
     public void visit(ClassConstructorNode node) {
         if (isVisitingGlobalVariable) {
             curFunction = new DeclaredFunction(node.getName() + ".__constructor__");
-            declaredFunctions.add(curFunction);
+            top.add(curFunction);
             functionMap.put(node.getEntity(), curFunction);
             return;
         }
@@ -684,6 +695,7 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(StringConstNode node) {
         curReg = new StringConst(node.getStr());
+        top.add(((StringConst) curReg));
     }
 
     @Override

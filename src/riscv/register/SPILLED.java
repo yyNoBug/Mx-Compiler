@@ -1,5 +1,17 @@
 package riscv.register;
 
-public class SPILLED extends REGISTER {
+import riscv.RVFunction;
+import riscv.addr.Address;
+import riscv.addr.StackAddr;
 
+public class SPILLED extends REGISTER {
+    private Address addr;
+
+    public SPILLED(RVFunction function) {
+        addr = new StackAddr(function, function.getTopIndex());
+    }
+
+    public Address getAddr() {
+        return addr;
+    }
 }

@@ -1,7 +1,12 @@
 package riscv.instruction;
 
 import riscv.RVBlock;
+import riscv.RVFunction;
 import riscv.register.REGISTER;
+import riscv.register.VIRTUAL;
+
+import java.util.ListIterator;
+import java.util.Map;
 
 public class BR extends Instruction {
     private OpClass.Cmp op;
@@ -13,6 +18,13 @@ public class BR extends Instruction {
         this.lhs = lhs;
         this.rhs = rhs;
         this.dest = dest;
+    }
+
+    @Override
+    public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
+                        RVFunction function) {
+        lhs = super.resolveSrc(virtualMap, itr, lhs, 3);
+        rhs = super.resolveSrc(virtualMap, itr, rhs, 4);
     }
 
     @Override

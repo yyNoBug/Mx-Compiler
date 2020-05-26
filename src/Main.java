@@ -6,6 +6,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import parser.MxLangErrorListener;
 import parser.MxLangLexer;
 import parser.MxLangParser;
+import riscv.RISCVGenerator;
+import riscv.RegisterAllocator;
 import scope.TopLevelScope;
 
 import java.io.FileInputStream;
@@ -38,10 +40,17 @@ public class Main {
         new ClassMemberScanner(globalScope).visit(programNode);
         new EntityBuilder(globalScope).visit(programNode);
         new SemanticChecker(globalScope).visit(programNode);
+
         var irBuilder = new IRBuilder(globalScope);
         irBuilder.visit(programNode);
         irBuilder.printIR();
-    }
+        var irTop = irBuilder.getTop();
 
+        var rvGenerator = new RISCVGenerator(irTop);
+        rvGenerator.generateRVAssembly();
+        var rvTop = rvGenerator.getRvTop();
+        new RegisterAllocator(rvTop).allocate();
+        rvTop.printRV();
+    }
 
 }

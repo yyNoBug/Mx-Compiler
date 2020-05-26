@@ -16,6 +16,14 @@ public class Address {
         this.offset = 0;
     }
 
+    public REGISTER getBase() {
+        return base;
+    }
+
+    public void setBase(REGISTER base) {
+        this.base = base;
+    }
+
     @Override
     public String toString() {
         return offset + "(" + base + ")";

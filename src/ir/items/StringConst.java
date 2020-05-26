@@ -10,6 +10,10 @@ public class StringConst extends Item {
         this.str = str;
     }
 
+    public String getStr() {
+        return str;
+    }
+
     @Override
     public String toString() {
         return super.toString();

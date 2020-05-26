@@ -1,7 +1,12 @@
 package riscv.instruction;
 
+import riscv.RVFunction;
 import riscv.addr.Address;
 import riscv.register.REGISTER;
+import riscv.register.VIRTUAL;
+
+import java.util.ListIterator;
+import java.util.Map;
 
 public class LOAD extends Instruction {
     REGISTER reg;
@@ -13,7 +18,14 @@ public class LOAD extends Instruction {
     }
 
     @Override
+    public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
+                        RVFunction function) {
+        reg = super.resolveDest(virtualMap, itr, reg, function, 5);
+        super.resolveAddr(virtualMap, itr, addr, 4);
+    }
+
+    @Override
     public String toString() {
-        return "\tlw\t" + reg + ", " + addr;
+        return "\tlw\t" + reg + "," + addr;
     }
 }
