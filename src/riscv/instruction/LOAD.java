@@ -25,6 +25,11 @@ public class LOAD extends Instruction {
     }
 
     @Override
+    public void addrValidate(ListIterator<Instruction> itr) {
+        addr = super.changeAddr(addr, itr);
+    }
+
+    @Override
     public String toString() {
         return "\tlw\t" + reg + "," + addr;
     }

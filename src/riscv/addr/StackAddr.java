@@ -17,8 +17,10 @@ public class StackAddr extends Address {
         super.offset = function.getSize() - (index + 1) * 4;
     }
 
-    public int calculate(){
-        return function.getSize() - (index + 1) * 4;
+    @Override
+    public int getOffset() {
+        validate();
+        return super.getOffset();
     }
 
     @Override

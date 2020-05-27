@@ -20,6 +20,10 @@ public class Address {
         return base;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
     public void setBase(REGISTER base) {
         this.base = base;
     }

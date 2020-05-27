@@ -13,6 +13,8 @@ abstract public class Instruction {
     abstract public void resolve(Map<VIRTUAL, REGISTER> virtualMap,
                                  ListIterator<Instruction> itr, RVFunction function);
 
+    public void addrValidate(ListIterator<Instruction> itr) {    }
+
     protected REGISTER resolveSrc(Map<VIRTUAL, REGISTER> virtualMap,
                               ListIterator<Instruction> itr, REGISTER src, int n) {
         REGISTER ret = src;
@@ -61,5 +63,17 @@ abstract public class Instruction {
                 addr.setBase(REGISTER.temps[n]);
             }
         }
+    }
+
+    protected Address changeAddr(Address addr, ListIterator<Instruction> itr) {
+        int offset = addr.getOffset();
+        if (offset > 2047 || offset < -2048){
+            var base = addr.getBase();
+            itr.previous();
+            itr.add(new CalcI(OpClass.Op.ADD, base, base, offset));
+            itr.add(new CalcI(OpClass.Op.ADD, base, base, -offset));
+            itr.next();
+            return new Address(base, 0);
+        } else return addr;
     }
 }

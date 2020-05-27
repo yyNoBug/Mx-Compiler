@@ -1,18 +1,27 @@
 package riscv.instruction;
 
+import riscv.addr.Address;
 import riscv.addr.StackAddr;
 import riscv.register.REGISTER;
 
-public class LAddr extends LI {
-    private StackAddr addr;
+import java.util.ListIterator;
 
-    public LAddr(REGISTER reg, StackAddr addr) {
+public class LAddr extends LI {
+    private Address addr;
+
+    public LAddr(REGISTER reg, Address addr) {
         super(reg, 0);
+        assert addr instanceof StackAddr;
         this.addr = addr;
     }
 
     private void validate() {
-        super.imm = addr.calculate();
+        super.imm = addr.getOffset();
+    }
+
+    @Override
+    public void addrValidate(ListIterator<Instruction> itr) {
+        addr = super.changeAddr(addr, itr);
     }
 
     @Override

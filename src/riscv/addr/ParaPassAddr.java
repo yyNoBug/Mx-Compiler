@@ -15,6 +15,12 @@ public class ParaPassAddr extends Address {
     }
 
     @Override
+    public int getOffset() {
+        validate();
+        return super.getOffset();
+    }
+
+    @Override
     public String toString() {
         validate();
         return super.toString();

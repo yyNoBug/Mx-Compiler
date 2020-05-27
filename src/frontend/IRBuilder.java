@@ -348,6 +348,28 @@ public class IRBuilder implements ASTVisitor {
     }
 
     @Override
+    public void visit(IdExprNode node) {
+        if (node.getFuncEntity() == null) {
+            Item ret;
+            if (leftValueRequireStack.peek()) {
+                ret = idMap.get(node.getEntity());
+                if (ret == null) {
+                    Item offset = new NumConst(curClassEntity.calOffset(node.getId()) * 4);
+                    ret = new Local();
+                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, curThisPointer, offset, ret));
+                }
+            } else {
+                ret = new Local();
+                curBlock.add(new LoadStmt(idMap.get(node.getEntity()), ret));
+            }
+            curReg = ret;
+        } else {
+            System.err.println("Error in IRBuilder!");
+            // This node should not represent a function.
+        }
+    }
+
+    @Override
     public void visit(ArrayExprNode node) {
         leftValueRequireStack.push(false);
         node.getArray().accept(this);
@@ -359,10 +381,15 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.pop();
         Item ind = curReg;
         Local offset = new Local();
-        curBlock.add(new OpStmt(OpStmt.Op.MUL, ind, new NumConst(node.getArray().getType().getEntity().getClassSize()), offset));
-
+        int size = 4;
+        curBlock.add(new OpStmt(OpStmt.Op.MUL, ind, new NumConst(size), offset));
         Local ret = new Local();
         curBlock.add(new OpStmt(OpStmt.Op.PLUS, base, offset, ret));
+        if (!leftValueRequireStack.peek()) {
+            Local src = ret;
+            ret = new Local();
+            curBlock.add(new LoadStmt(src, ret));
+        }
         curReg = ret;
     }
 
@@ -380,6 +407,11 @@ public class IRBuilder implements ASTVisitor {
             Item offset = new NumConst(node.getExpr().getType().getEntity().calOffset(node.getMember()) * 4);
             ret = new Local();
             curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, offset, ret));
+        }
+        if (!leftValueRequireStack.peek()) {
+            var src = ret;
+            ret = new Local();
+            curBlock.add(new LoadStmt(src, ret));
         }
         curReg = ret;
     }
@@ -585,6 +617,7 @@ public class IRBuilder implements ASTVisitor {
                 } else {
                     curBlock.add(new OpStmt(OpStmt.Op.NEQ, lhs, rhs, ret));
                 }
+                break;
             case LEQ:
                 if (node.getLhs().getType() instanceof StringType) {
                     var para = new ArrayList<Item>();
@@ -622,7 +655,7 @@ public class IRBuilder implements ASTVisitor {
                     para.add(rhs);
                     curBlock.add(new CallStmt(BuiltinFunction.stringGreater, para, ret));
                 } else {
-                    curBlock.add(new OpStmt(OpStmt.Op.GEQ, lhs, rhs, ret));
+                    curBlock.add(new OpStmt(OpStmt.Op.GTH, lhs, rhs, ret));
                 }
                 break;
             case ADD:
@@ -679,29 +712,6 @@ public class IRBuilder implements ASTVisitor {
         Item rhs = curReg;
 
         curBlock.add(new StoreStmt(rhs, lhs));
-    }
-
-    @Override
-    public void visit(IdExprNode node) {
-        if (node.getFuncEntity() == null) {
-            Item ret;
-            if (leftValueRequireStack.peek()) {
-                ret = idMap.get(node.getEntity());
-                if (ret == null) {
-                    Local t = curThisPointer;
-                    Item offset = new NumConst(curClassEntity.calOffset(node.getId()) * 4);
-                    ret = new Local();
-                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, curThisPointer, offset, ret));
-                }
-            } else {
-                ret = new Local();
-                curBlock.add(new LoadStmt(idMap.get(node.getEntity()), ret));
-            }
-            curReg = ret;
-        } else {
-            System.err.println("Error in IRBuilder!");
-            // This node should not represent a function.
-        }
     }
 
     @Override
