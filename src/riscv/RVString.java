@@ -8,7 +8,7 @@ public class RVString {
     String asmForm;
 
     public RVString(StringConst str) {
-        name = "string" + str.getNumber();
+        name = "string" + str.getNum();
     }
 
     private String getEscapedString() {

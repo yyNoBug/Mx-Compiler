@@ -29,9 +29,9 @@ string __mallocString__(int length) {
 }
 
 int __getInt__() {
-    int a;
-    scanf("%d", &a);
-    return a;
+    int ret;
+    scanf("%d", &ret);
+    return ret;
 }
 
 char input[257];

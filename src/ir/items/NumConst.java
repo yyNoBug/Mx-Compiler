@@ -8,6 +8,10 @@ public class NumConst extends Item {
         this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return value + "";

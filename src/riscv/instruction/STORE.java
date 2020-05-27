@@ -20,8 +20,8 @@ public class STORE extends Instruction {
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {
-        reg = super.resolveSrc(virtualMap, itr, reg, 3);
         super.resolveAddr(virtualMap, itr, addr, 4);
+        reg = super.resolveSrc(virtualMap, itr, reg, 3);
     }
 
     @Override

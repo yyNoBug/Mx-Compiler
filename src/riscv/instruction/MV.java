@@ -25,6 +25,6 @@ public class MV extends Instruction {
 
     @Override
     public String toString() {
-        return "\tmv\t" + dest + ", " + src;
+        return "\tmv\t" + dest + "," + src;
     }
 }

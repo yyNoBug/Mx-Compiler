@@ -13,6 +13,7 @@ import scope.DefinedVariable;
 import scope.TopLevelScope;
 import type.ClassType;
 import type.StringType;
+import type.VoidType;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -45,7 +46,6 @@ public class IRBuilder implements ASTVisitor {
         for (Global global : top.getGlobals()) {
             System.out.println("global " + global);
         }
-        System.out.println();
 
         for (StringConst str : top.getStrs()) {
             System.out.println("string " + str + " = \"" + str.getStr() + "\"");
@@ -114,9 +114,9 @@ public class IRBuilder implements ASTVisitor {
                 node.getExpr().accept(this);
                 leftValueRequireStack.pop();
                 curBlock.add(new StoreStmt(curReg, local));
-            } else {
+            } /*else {
                 curBlock.add(new StoreStmt(new NumConst(0), local));
-            }
+            }*/
         }
     }
 
@@ -133,7 +133,7 @@ public class IRBuilder implements ASTVisitor {
         }
 
         curFunction = ((DeclaredFunction) functionMap.get(node.getEntity()));
-        Block entry = new Block("entry");
+        Block entry = new Block(curFunction.getName() + ".entry");
 
         if (node.getName().equals("main")) {
             enterBlock(new Block("init_global"));
@@ -249,6 +249,7 @@ public class IRBuilder implements ASTVisitor {
         Block conditionBlock = new Block("while." + whileCount + ".condition");
         Block bodyBlock = new Block("while." + whileCount + ".body");
         Block endBlock = new Block("while." + whileCount + ".end");
+        whileCount++;
         loopMap.put(node, conditionBlock, endBlock);
         curBlock.add(new JmpStmt(conditionBlock));
 
@@ -263,7 +264,6 @@ public class IRBuilder implements ASTVisitor {
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(endBlock);
-        whileCount++;
     }
 
     private int forCount = 0;
@@ -274,6 +274,7 @@ public class IRBuilder implements ASTVisitor {
         Block bodyBlock = new Block("for." + forCount + ".body");
         Block stepBlock = new Block("for." + forCount + ".step");
         Block endBlock = new Block("for." + forCount + ".end");
+        forCount++;
         loopMap.put(node, conditionBlock, endBlock);
         curBlock.add(new JmpStmt(conditionBlock));
 
@@ -292,7 +293,6 @@ public class IRBuilder implements ASTVisitor {
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(endBlock);
-        forCount++;
     }
 
     @Override
@@ -336,9 +336,15 @@ public class IRBuilder implements ASTVisitor {
             leftValueRequireStack.pop();
             parameters.add(curReg);
         });
-        Local result = new Local();
-        curBlock.add(new CallStmt(function, parameters, result));
-        curReg = result;
+
+        if (!(node.getFuncExpr().getFuncEntity().getType() instanceof VoidType)){
+            Local result = new Local();
+            curBlock.add(new CallStmt(function, parameters, result));
+            curReg = result;
+        } else {
+            curBlock.add(new CallStmt(function, parameters, null));
+            curReg = null;
+        }
     }
 
     @Override
@@ -401,9 +407,17 @@ public class IRBuilder implements ASTVisitor {
                 break;
             case PREFIX_INC:
                 curBlock.add(new OpStmt(OpStmt.Op.PLUS, item, new NumConst(1), ret));
+                leftValueRequireStack.push(true);
+                node.getExpr().accept(this);
+                leftValueRequireStack.pop();
+                curBlock.add(new StoreStmt(ret, curReg));
                 break;
             case PREFIX_DEC:
                 curBlock.add(new OpStmt(OpStmt.Op.MINUS, item, new NumConst(1), ret));
+                leftValueRequireStack.push(true);
+                node.getExpr().accept(this);
+                leftValueRequireStack.pop();
+                curBlock.add(new StoreStmt(ret, curReg));
                 break;
         }
         curReg = ret;
@@ -420,9 +434,17 @@ public class IRBuilder implements ASTVisitor {
         switch (node.getOp()) {
             case SUFFIX_INC:
                 curBlock.add(new OpStmt(OpStmt.Op.PLUS, item, new NumConst(1), ret));
+                leftValueRequireStack.push(true);
+                node.getExpr().accept(this);
+                leftValueRequireStack.pop();
+                curBlock.add(new StoreStmt(ret, curReg));
                 break;
             case SUFFIX_DEC:
                 curBlock.add(new OpStmt(OpStmt.Op.MINUS, item, new NumConst(1), ret));
+                leftValueRequireStack.push(true);
+                node.getExpr().accept(this);
+                leftValueRequireStack.pop();
+                curBlock.add(new StoreStmt(ret, curReg));
                 break;
         }
         curReg = ret;
@@ -514,7 +536,7 @@ public class IRBuilder implements ASTVisitor {
             Block first = curBlock;
             Block second = new Block("short." + shortCount + ".second");
             Block end = new Block("short." + shortCount + ".end");
-            if (node.getOp() == BinaryExprNode.Op.LOGIC_AND) {
+            if (node.getOp() == BinaryExprNode.Op.LOGIC_OR) {
                 curBlock.add(new BranchStmt(lhs, end, second));
             } else {
                 curBlock.add(new BranchStmt(lhs, second, end));

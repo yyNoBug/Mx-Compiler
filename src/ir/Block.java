@@ -1,11 +1,13 @@
 package ir;
 
+import ir.irStmt.PhiStmt;
 import ir.irStmt.Statement;
 
 import java.util.ArrayList;
 
 public class Block {
     private ArrayList<Statement> stmtList = new ArrayList<>();
+    private ArrayList<PhiStmt> phiStmts = new ArrayList<>();
     private String name;
 
     public Block(String name) {
@@ -16,12 +18,17 @@ public class Block {
         return stmtList;
     }
 
+    public ArrayList<PhiStmt> getPhiStmts() {
+        return phiStmts;
+    }
+
     public String getName() {
         return name;
     }
 
     public void add (Statement stmt) {
         stmtList.add(stmt);
+        if (stmt instanceof PhiStmt) phiStmts.add(((PhiStmt) stmt));
     }
 
     public Statement peak() {

@@ -21,8 +21,8 @@ public class SG extends Instruction {
 
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
-        rt = super.resolveDest(virtualMap, itr, rt, function, 5);
         rd = super.resolveSrc(virtualMap, itr, rd, 3);
+        rt = super.resolveDest(virtualMap, itr, rt, function, 5);
     }
 
     @Override

@@ -2,18 +2,19 @@ package ir.items;
 
 public class StringConst extends Item {
     private String str;
-    private int number;
+    private int num;
 
     static private int stringCount = 0;
 
     public StringConst(String str) {
         super("s" + stringCount);
-        number = stringCount++;
+        num = stringCount++;
         this.str = str;
     }
 
-    public int getNumber() {
-        return number;
+    @Override
+    public int getNum() {
+        return num;
     }
 
     private String getEscapedString() {

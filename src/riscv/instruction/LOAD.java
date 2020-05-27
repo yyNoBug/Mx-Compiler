@@ -20,8 +20,8 @@ public class LOAD extends Instruction {
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {
-        reg = super.resolveDest(virtualMap, itr, reg, function, 5);
         super.resolveAddr(virtualMap, itr, addr, 4);
+        reg = super.resolveDest(virtualMap, itr, reg, function, 5);
     }
 
     @Override

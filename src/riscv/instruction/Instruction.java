@@ -32,10 +32,19 @@ abstract public class Instruction {
                                    REGISTER dest, RVFunction function, int n) {
         REGISTER ret = dest;
         if (ret instanceof VIRTUAL) {
-            var spilled = new SPILLED(function);
-            virtualMap.put(((VIRTUAL) ret), spilled);
-            ret = REGISTER.temps[n];
-            itr.add(new STORE(ret, spilled.getAddr()));
+            if (virtualMap.containsKey(ret)) {
+                ret = virtualMap.get(ret);
+                if (ret instanceof SPILLED) {
+                    itr.add(new STORE(REGISTER.temps[n], ((SPILLED) ret).getAddr()));
+                    ret = REGISTER.temps[n];
+                }
+            }
+            else {
+                var spilled = new SPILLED(function);
+                virtualMap.put(((VIRTUAL) ret), spilled);
+                ret = REGISTER.temps[n];
+                itr.add(new STORE(ret, spilled.getAddr()));
+            }
         }
         return ret;
     }
