@@ -1,6 +1,8 @@
 /antlr/antlr-4.8-complete.jar
 /builtin/output.s
+/bin/*
 test.txt
 data.txt
+output.s
 *.out
 *.sh

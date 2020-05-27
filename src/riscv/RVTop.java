@@ -16,14 +16,26 @@ public class RVTop {
         return functions;
     }
 
-    public void printRV(int mode) {
+    public void printRV(String mode) {
         try {
             PrintWriter writer;
-            if (mode == 1) {
-                writer = new PrintWriter(System.out);
-            } else {
-                FileWriter fileWriter = new FileWriter("builtin/output.s");
-                writer = new PrintWriter(fileWriter);
+            switch (mode) {
+                case "yynb":
+                    writer = new PrintWriter(System.out);
+                    break;
+                case "debug": {
+                    FileWriter fileWriter = new FileWriter("builtin/output.s");
+                    writer = new PrintWriter(fileWriter);
+                    break;
+                }
+                case "codegen": {
+                    FileWriter fileWriter = new FileWriter("output.s");
+                    writer = new PrintWriter(fileWriter);
+                    break;
+                }
+                default:
+                    writer = new PrintWriter(System.out);
+                    break;
             }
             functions.forEach(x -> x.printRV(writer));
             writer.close();

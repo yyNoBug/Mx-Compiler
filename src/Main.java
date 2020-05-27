@@ -45,6 +45,8 @@ public class Main {
         new EntityBuilder(globalScope).visit(programNode);
         new SemanticChecker(globalScope).visit(programNode);
 
+        if (args.length > 0 && args[0].equals("sema")) return;
+
         var irBuilder = new IRBuilder(globalScope);
         irBuilder.visit(programNode);
         if(args.length == 0) irBuilder.printIR();
@@ -55,7 +57,11 @@ public class Main {
         var rvTop = rvGenerator.getRvTop();
         new RegisterAllocator(rvTop).allocate();
         //new AddrValidator(rvTop).validate();
-        rvTop.printRV(args.length);
+        if (args.length == 0) {
+            rvTop.printRV("debug");
+        } else {
+            rvTop.printRV(args[0]);
+        }
     }
 
 }
