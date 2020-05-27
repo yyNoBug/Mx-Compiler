@@ -333,13 +333,15 @@ public class IRBuilder implements ASTVisitor {
         Function function = functionMap.get(node.getFuncExpr().getFuncEntity());
         ArrayList<Item> parameters = new ArrayList<>();
         if (node.getFuncExpr().getFuncEntity().isMemberFunction()) {
-            if (curClassEntity == null) {
+            if (node.getFuncExpr() instanceof MemberExprNode) {
                 leftValueRequireStack.add(true);
                 node.getFuncExpr().accept(this);
                 leftValueRequireStack.pop();
                 parameters.add(curReg);
             } else {
-                parameters.add(curThisPointer);
+                Local thisPointer = new Local();
+                curBlock.add(new LoadStmt(curThisPointer, thisPointer));
+                parameters.add(thisPointer);
             }
         }
         node.getParameterList().forEach(x -> {
@@ -740,7 +742,9 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ThisExprNode node) {
-        curReg = curThisPointer;
+        Local thisPointer = new Local();
+        curBlock.add(new LoadStmt(curThisPointer, thisPointer));
+        curReg = thisPointer;
     }
 
     @Override

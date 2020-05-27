@@ -20,12 +20,12 @@ abstract public class Instruction {
         REGISTER ret = src;
         if (ret instanceof VIRTUAL) {
             ret = virtualMap.get(ret);
-            if (ret instanceof SPILLED) {
-                itr.previous();
-                itr.add(new LOAD(REGISTER.temps[n], ((SPILLED) ret).getAddr()));
-                itr.next();
-                ret = REGISTER.temps[n];
-            }
+        }
+        if (ret instanceof SPILLED) {
+            itr.previous();
+            itr.add(new LOAD(REGISTER.temps[n], ((SPILLED) ret).getAddr()));
+            itr.next();
+            ret = REGISTER.temps[n];
         }
         return ret;
     }

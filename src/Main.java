@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import parser.MxLangErrorListener;
 import parser.MxLangLexer;
 import parser.MxLangParser;
-import riscv.AddrValidator;
 import riscv.RISCVGenerator;
 import riscv.RegisterAllocator;
 import scope.TopLevelScope;
@@ -55,7 +54,7 @@ public class Main {
         rvGenerator.generateRVAssembly();
         var rvTop = rvGenerator.getRvTop();
         new RegisterAllocator(rvTop).allocate();
-        new AddrValidator(rvTop).validate();
+        //new AddrValidator(rvTop).validate();
         rvTop.printRV(args.length);
     }
 
