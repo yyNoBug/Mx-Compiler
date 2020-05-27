@@ -54,7 +54,7 @@ public class IRBuilder implements ASTVisitor {
             }
 
             for (StringConst str : top.getStrs()) {
-                writer.println("string " + str + " = \"" + str.getStr() + "\"");
+                writer.println("string " + str + " = \"" + str.getEscapedString() + "\"");
             }
 
             writer.println();

@@ -17,7 +17,7 @@ public class StringConst extends Item {
         return num;
     }
 
-    private String getEscapedString() {
+    public String getEscapedString() {
         StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             switch (str.charAt(i)) {
@@ -32,7 +32,7 @@ public class StringConst extends Item {
     }
 
     public String getStr() {
-        return getEscapedString();
+        return str;
     }
 
     @Override

@@ -1,4 +1,5 @@
 /antlr/antlr-4.8-complete.jar
+/builtin/output.s
 test.txt
 data.txt
 *.out

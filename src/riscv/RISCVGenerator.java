@@ -52,7 +52,7 @@ public class RISCVGenerator implements IRVisitor {
         curBlock = new RVBlock("string" + str.getNum());
         curFunction.add(curBlock);
         curBlock.add(new DirWORD(str.getStr().length()));
-        curBlock.add(new DirSTRING(str.getStr()));
+        curBlock.add(new DirSTRING(str.getEscapedString()));
     }
 
     public void generateRVAssembly() {
@@ -186,7 +186,7 @@ public class RISCVGenerator implements IRVisitor {
         for (int i = size - 1; i >= 8; --i) {
             curBlock.add(new STORE(createReg(stmt.getParameters().get(i)), new ParaPassAddr(i)));
         }
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size && i < 8; ++i) {
             curBlock.add(new MV(REGISTER.args[i], createReg(stmt.getParameters().get(i))));
         }
         curBlock.add(new Call(stmt.getSymbol()));

@@ -48,7 +48,7 @@ public class Main {
 
         var irBuilder = new IRBuilder(globalScope);
         irBuilder.visit(programNode);
-        irBuilder.printIR();
+        if(args.length == 0) irBuilder.printIR();
         var irTop = irBuilder.getTop();
 
         var rvGenerator = new RISCVGenerator(irTop);
