@@ -327,7 +327,7 @@ public class IRBuilder implements ASTVisitor {
                 leftValueRequireStack.pop();
                 parameters.add(curReg);
             } else {
-                //TODO
+                parameters.add(curThisPointer);
             }
         }
         node.getParameterList().forEach(x -> {

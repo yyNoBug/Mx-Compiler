@@ -1,20 +1,19 @@
 package riscv.addr;
 
-import riscv.RVFunction;
 import riscv.register.REGISTER;
 
 public class ParaCallAddr extends Address {
-    private RVFunction function;
+    //private RVFunction function;
     private int index;
 
-    public ParaCallAddr(RVFunction function, int index) {
+    public ParaCallAddr(/*RVFunction function, */int index) {
         super(REGISTER.sp);
-        this.function = function;
+        //this.function = function;
         this.index = index;
     }
 
     private void validate() {
-        super.offset = function.getSize() + (index - 8) * 4;
+        super.offset = /*function.getSize() + */(index - 8) * 4;
     }
 
     @Override

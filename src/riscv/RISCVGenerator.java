@@ -7,10 +7,12 @@ import ir.IRVisitor;
 import ir.irStmt.*;
 import ir.items.*;
 import riscv.addr.Address;
+import riscv.addr.ParaCallAddr;
 import riscv.addr.ParaPassAddr;
 import riscv.addr.StackAddr;
 import riscv.instruction.*;
 import riscv.register.REGISTER;
+import riscv.register.SPILLED;
 import riscv.register.VIRTUAL;
 
 import java.util.LinkedHashMap;
@@ -22,11 +24,13 @@ public class RISCVGenerator implements IRVisitor {
 
     private RVFunction curFunction;
     private RVBlock curBlock;
+    private DeclaredFunction curIRFunction;
     private Block curIRBlock;
     private boolean isPreScanning = false;
 
     private Map<Item, REGISTER> regMap = new LinkedHashMap<>();
     private Map<Block, RVBlock> blkMap = new LinkedHashMap<>();
+    private Map<DeclaredFunction, RVBlock> functionExitBlkMap = new LinkedHashMap<>();
     private Map<PhiStmt, REGISTER> phiMap = new LinkedHashMap<>();
 
     public RISCVGenerator(IRTop irTop) {
@@ -95,14 +99,22 @@ public class RISCVGenerator implements IRVisitor {
     private void visit(DeclaredFunction function) {
         if (isPreScanning) {
             function.getBlockList().forEach(x -> visit(x));
+            functionExitBlkMap.put(function,
+                    new RVBlock("." + function.getName() + ".exit"));
             return;
         }
 
         int i = 0;
         for (Item arg : function.getArgs()) {
             regMap.put(arg, REGISTER.args[i++]);
+            if (i == 8) break;
+        }
+        for (; i < function.getArgs().size(); ++i) {
+            regMap.put(function.getArgs().get(i),
+                    new SPILLED(new ParaCallAddr(i)));
         }
 
+        curIRFunction = function;
         curFunction = new RVFunction(function);
         rvTop.add(curFunction);
         curBlock = new RVBlock("." + function.getName());
@@ -113,6 +125,8 @@ public class RISCVGenerator implements IRVisitor {
 
         function.getBlockList().forEach(x -> visit(x));
 
+        curBlock = functionExitBlkMap.get(function);
+        curFunction.add(curBlock);
         curBlock.add(new LOAD(REGISTER.ra, new StackAddr(curFunction, 0)));
         curBlock.add(new SPRecover(curFunction));
         curBlock.add(new JR(REGISTER.ra));
@@ -296,7 +310,9 @@ public class RISCVGenerator implements IRVisitor {
 
     @Override
     public void visit(RetStmt stmt) {
-        curBlock.add(new MV(REGISTER.args[0], createReg(stmt.getItem())));
+        if (stmt.getItem() != null)
+            curBlock.add(new MV(REGISTER.args[0], createReg(stmt.getItem())));
+        curBlock.add(new J(functionExitBlkMap.get(curIRFunction)));
     }
 
     @Override
