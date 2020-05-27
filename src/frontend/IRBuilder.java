@@ -85,6 +85,9 @@ public class IRBuilder implements ASTVisitor {
     public void visit(ProgramNode node) {
         isVisitingGlobalVariable = true;
         for (DeclarationNode declarationNode: node.getSection_list()) {
+            if (declarationNode instanceof ClassDeclNode)
+                curClassEntity = ((ClassDeclNode) declarationNode).getEntity();
+            else curClassEntity = null;
             declarationNode.accept(this);
         }
 
@@ -197,7 +200,7 @@ public class IRBuilder implements ASTVisitor {
         }
 
         curFunction = ((DeclaredFunction) functionMap.get(node.getEntity()));
-        enterBlock(new Block("entry"));
+        enterBlock(new Block(curFunction.getName() + ".entry"));
 
         Local parameterValue = new Local();
         curFunction.defineArg(parameterValue);
