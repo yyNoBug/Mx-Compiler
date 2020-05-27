@@ -1,3 +1,5 @@
 /antlr/antlr-4.8-complete.jar
 test.txt
+data.txt
+*.out
 *.sh

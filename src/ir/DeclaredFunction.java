@@ -2,6 +2,7 @@ package ir;
 
 import ir.items.Item;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class DeclaredFunction extends Function {
@@ -20,7 +21,7 @@ public class DeclaredFunction extends Function {
     }
 
     @Override
-    public void printIR() {
+    public void printIR(PrintWriter writer) {
         StringBuilder str = new StringBuilder("fun " + name + "(");
         boolean flag = false;
         for (Item parameter : args) {
@@ -29,10 +30,10 @@ public class DeclaredFunction extends Function {
             flag = true;
         }
         str.append(")");
-        System.out.println(str);
+        writer.println(str);
 
         for (Block block : super.blockList) {
-            block.printIR();
+            block.printIR(writer);
         }
     }
 }

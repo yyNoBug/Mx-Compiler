@@ -21,9 +21,9 @@ public class StringConst extends Item {
         StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             switch (str.charAt(i)) {
-                case '\n': strBuilder.append("\\\n"); break;
+                case '\n': strBuilder.append("\\n"); break;
                 case '\\': strBuilder.append("\\\\"); break;
-                case '\t': strBuilder.append("\\\t"); break;
+                case '\t': strBuilder.append("\\t"); break;
                 case '\"': strBuilder.append("\\\""); break;
                 default: strBuilder.append(str.charAt(i));
             }

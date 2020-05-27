@@ -3,6 +3,7 @@ package ir;
 import ir.irStmt.PhiStmt;
 import ir.irStmt.Statement;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Block {
@@ -41,10 +42,10 @@ public class Block {
         return name;
     }
 
-    public void printIR() {
-        System.out.println("  " + name + ":");
+    public void printIR(PrintWriter writer) {
+        writer.println("  " + name + ":");
         for (Statement statement : stmtList) {
-            System.out.println("    " + statement);
+            writer.println("    " + statement);
         }
     }
 }

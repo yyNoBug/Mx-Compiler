@@ -29,8 +29,12 @@ public class Main {
 
     public static void main (String[] args) throws Exception {
 
-
-        InputStream in = new FileInputStream("test.txt");
+        InputStream in;
+        if (args.length > 0) {
+            in = new FileInputStream("test.txt");
+        } else {
+            in = new FileInputStream("data.txt");
+        }
 
         ProgramNode programNode = buildASTTree(in);
 
@@ -52,7 +56,7 @@ public class Main {
         var rvTop = rvGenerator.getRvTop();
         new RegisterAllocator(rvTop).allocate();
         new AddrValidator(rvTop).validate();
-        rvTop.printRV();
+        rvTop.printRV(args.length);
     }
 
 }

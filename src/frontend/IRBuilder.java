@@ -15,6 +15,9 @@ import type.ClassType;
 import type.StringType;
 import type.VoidType;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
@@ -42,22 +45,31 @@ public class IRBuilder implements ASTVisitor {
     }
 
     public void printIR(){
-        var map = globalMap.getGlobalList();
-        for (Global global : top.getGlobals()) {
-            System.out.println("global " + global);
+        try {
+            FileWriter fileWriter = new FileWriter("ir.out");
+            PrintWriter writer = new PrintWriter(fileWriter);
+            var map = globalMap.getGlobalList();
+            for (Global global : top.getGlobals()) {
+                writer.println("global " + global);
+            }
+
+            for (StringConst str : top.getStrs()) {
+                writer.println("string " + str + " = \"" + str.getStr() + "\"");
+            }
+
+            writer.println();
+
+            var declaredFunctions = top.getFunctions();
+            for (DeclaredFunction function : declaredFunctions) {
+                function.printIR(writer);
+                writer.println();
+            }
+
+            writer.close();
+        } catch (IOException e){
+            e.printStackTrace();
         }
 
-        for (StringConst str : top.getStrs()) {
-            System.out.println("string " + str + " = \"" + str.getStr() + "\"");
-        }
-
-        System.out.println();
-
-        var declaredFunctions = top.getFunctions();
-        for (DeclaredFunction function : declaredFunctions) {
-            function.printIR();
-            System.out.println();
-        }
     }
 
     public IRTop getTop() {
@@ -350,6 +362,7 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(IdExprNode node) {
         if (node.getFuncEntity() == null) {
+            if (leftValueRequireStack.empty()) return;
             Item ret;
             if (leftValueRequireStack.peek()) {
                 ret = idMap.get(node.getEntity());
@@ -362,7 +375,15 @@ public class IRBuilder implements ASTVisitor {
                 }
             } else {
                 ret = new Local();
-                curBlock.add(new LoadStmt(idMap.get(node.getEntity()), ret));
+                var x = idMap.get(node.getEntity());
+                if (x == null) {
+                    Item offset = new NumConst(curClassEntity.calOffset(node.getId()) * 4);
+                    Item thisPointer = new Local();
+                    curBlock.add(new LoadStmt(curThisPointer, thisPointer));
+                    x = new Local();
+                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, thisPointer, offset, x));
+                }
+                curBlock.add(new LoadStmt(x, ret));
             }
             curReg = ret;
         } else {
@@ -387,6 +408,7 @@ public class IRBuilder implements ASTVisitor {
         curBlock.add(new OpStmt(OpStmt.Op.MUL, ind, new NumConst(size), offset));
         Local ret = new Local();
         curBlock.add(new OpStmt(OpStmt.Op.PLUS, base, offset, ret));
+        if (leftValueRequireStack.empty()) return;
         if (!leftValueRequireStack.peek()) {
             Local src = ret;
             ret = new Local();
@@ -404,12 +426,12 @@ public class IRBuilder implements ASTVisitor {
         Item ret;
         if (node.getFuncEntity() != null) {
             ret = parent;
-            // curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, new NumConst(0), ret));
         } else {
             Item offset = new NumConst(node.getExpr().getType().getEntity().calOffset(node.getMember()) * 4);
             ret = new Local();
             curBlock.add(new OpStmt(OpStmt.Op.PLUS, parent, offset, ret));
         }
+        if (leftValueRequireStack.empty()) return;
         if (!leftValueRequireStack.peek()) {
             var src = ret;
             ret = new Local();
@@ -462,23 +484,23 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.push(false);
         node.getExpr().accept(this);
         leftValueRequireStack.pop();
-        Item item = curReg;
+        Item ret = curReg;
 
-        Local ret = new Local();
+        Item item = new Local();
         switch (node.getOp()) {
             case SUFFIX_INC:
-                curBlock.add(new OpStmt(OpStmt.Op.PLUS, item, new NumConst(1), ret));
+                curBlock.add(new OpStmt(OpStmt.Op.PLUS, curReg, new NumConst(1), item));
                 leftValueRequireStack.push(true);
                 node.getExpr().accept(this);
                 leftValueRequireStack.pop();
-                curBlock.add(new StoreStmt(ret, curReg));
+                curBlock.add(new StoreStmt(item, curReg));
                 break;
             case SUFFIX_DEC:
-                curBlock.add(new OpStmt(OpStmt.Op.MINUS, item, new NumConst(1), ret));
+                curBlock.add(new OpStmt(OpStmt.Op.MINUS, curReg, new NumConst(1), item));
                 leftValueRequireStack.push(true);
                 node.getExpr().accept(this);
                 leftValueRequireStack.pop();
-                curBlock.add(new StoreStmt(ret, curReg));
+                curBlock.add(new StoreStmt(item, curReg));
                 break;
         }
         curReg = ret;
@@ -730,7 +752,6 @@ public class IRBuilder implements ASTVisitor {
     public void visit(StringConstNode node) {
         curReg = new StringConst(node.getStr());
         top.add(((StringConst) curReg));
-        System.out.println();
     }
 
     @Override

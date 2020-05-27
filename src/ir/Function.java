@@ -1,5 +1,6 @@
 package ir;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 abstract public class Function {
@@ -27,10 +28,10 @@ abstract public class Function {
         return name;
     }
 
-    public void printIR() {
+    public void printIR(PrintWriter writer) {
         for (Block block : blockList) {
-            System.out.println("fun " + name + "()");
-            block.printIR();
+            writer.println("fun " + name + "()");
+            block.printIR(writer);
         }
     }
 }

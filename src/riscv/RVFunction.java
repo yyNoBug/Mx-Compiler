@@ -2,6 +2,7 @@ package riscv;
 
 import ir.DeclaredFunction;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class RVFunction {
@@ -39,8 +40,8 @@ public class RVFunction {
         if (bottom > this.bottom) this.bottom = bottom;
     }
 
-    public void printRV() {
-        if (! name.equals("__program_begin__")) System.out.println(name + ":");
-        blocks.forEach(x -> x.printRV());
+    public void printRV(PrintWriter writer) {
+        if (! name.equals("__program_begin__")) writer.println(name + ":");
+        blocks.forEach(x -> x.printRV(writer));
     }
 }

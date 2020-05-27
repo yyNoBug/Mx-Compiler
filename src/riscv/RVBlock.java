@@ -3,6 +3,7 @@ package riscv;
 import ir.Block;
 import riscv.instruction.Instruction;
 
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,11 +27,11 @@ public class RVBlock {
         instructions.add(inst);
     }
 
-    public void printRV(){
+    public void printRV(PrintWriter writer){
         if (!name.equals("__invisible__"))
-            System.out.println(name + ":");
+            writer.println(name + ":");
         for (Instruction instruction : instructions) {
-            System.out.println(instruction);
+            writer.println(instruction);
         }
     }
 
