@@ -322,7 +322,7 @@ public class IRBuilder implements ASTVisitor {
         ArrayList<Item> parameters = new ArrayList<>();
         if (node.getFuncExpr().getFuncEntity().isMemberFunction()) {
             if (curClassEntity == null) {
-                leftValueRequireStack.add(false);
+                leftValueRequireStack.add(true);
                 node.getFuncExpr().accept(this);
                 leftValueRequireStack.pop();
                 parameters.add(curReg);
@@ -355,8 +355,10 @@ public class IRBuilder implements ASTVisitor {
                 ret = idMap.get(node.getEntity());
                 if (ret == null) {
                     Item offset = new NumConst(curClassEntity.calOffset(node.getId()) * 4);
+                    Item thisPointer = new Local();
+                    curBlock.add(new LoadStmt(curThisPointer, thisPointer));
                     ret = new Local();
-                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, curThisPointer, offset, ret));
+                    curBlock.add(new OpStmt(OpStmt.Op.PLUS, thisPointer, offset, ret));
                 }
             } else {
                 ret = new Local();
