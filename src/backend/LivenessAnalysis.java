@@ -22,13 +22,12 @@ public class LivenessAnalysis {
             uses.addAll(instUses);
             defs.addAll(instruction.getDefs());
         }
-        System.err.println("" + block + uses + defs);
+        //System.err.println("" + block + uses + defs);
         blockUses.put(block, uses);
         blockDefs.put(block, defs);
         block.liveIn = new HashSet<>();
         block.liveOut = new HashSet<>();
     }
-
 
     static void runBackward(RVBlock block) {
         if (visited.contains(block)) return;

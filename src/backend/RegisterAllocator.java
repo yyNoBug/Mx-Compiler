@@ -153,7 +153,7 @@ public class RegisterAllocator {
                 for (REGISTER def : defs) {
                     for (REGISTER reg : currentLive) {
                         addEdge(reg, def);
-                        System.err.println(reg + " " + def); // TODO
+                        //System.err.println(reg + " " + def); // TODO
                     }
                 }
                 currentLive.removeAll(defs);
