@@ -4,6 +4,7 @@ import riscv.addr.Address;
 import riscv.addr.StackAddr;
 import riscv.register.REGISTER;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 
 public class LAddr extends LI {
@@ -22,6 +23,18 @@ public class LAddr extends LI {
     @Override
     public void addrValidate(ListIterator<Instruction> itr) {
         addr = super.changeAddr(addr, itr);
+    }
+
+    @Override
+    public HashSet<REGISTER> getDefs() {
+        validate();
+        return super.getDefs();
+    }
+
+    @Override
+    public void replaceRd(REGISTER old, REGISTER newReg) {
+        validate();
+        super.replaceRd(old, newReg);
     }
 
     @Override

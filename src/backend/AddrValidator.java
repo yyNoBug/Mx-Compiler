@@ -1,4 +1,8 @@
-package riscv;
+package backend;
+
+import riscv.RVBlock;
+import riscv.RVFunction;
+import riscv.RVTop;
 
 public class AddrValidator {
     private RVTop top;

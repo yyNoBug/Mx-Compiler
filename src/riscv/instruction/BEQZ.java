@@ -5,6 +5,7 @@ import riscv.RVFunction;
 import riscv.register.REGISTER;
 import riscv.register.VIRTUAL;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -21,6 +22,18 @@ public class BEQZ extends Instruction {
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {
         cond = super.resolveSrc(virtualMap, itr, cond, 3);
+    }
+
+    @Override
+    public HashSet<REGISTER> getUses() {
+        return new HashSet<>(){{add(cond);}};
+    }
+
+    @Override
+    public void replaceUse(REGISTER old, REGISTER newReg) {
+        if (cond == old) {
+            cond = newReg;
+        }
     }
 
     @Override

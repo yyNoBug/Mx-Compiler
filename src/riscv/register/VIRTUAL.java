@@ -6,10 +6,11 @@ public class VIRTUAL extends REGISTER {
     private int num;
 
     public VIRTUAL() {
-        num = 0;
+        num = cnt++;
     }
 
-    public VIRTUAL(int num) {
-        this.num = num;
+    @Override
+    public String toString() {
+        return "v" + num;
     }
 }

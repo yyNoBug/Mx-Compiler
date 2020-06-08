@@ -1,4 +1,6 @@
 import ast.ProgramNode;
+import backend.RISCVGenerator;
+import backend.RegisterAllocator;
 import frontend.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -6,8 +8,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import parser.MxLangErrorListener;
 import parser.MxLangLexer;
 import parser.MxLangParser;
-import riscv.RISCVGenerator;
-import riscv.RegisterAllocator;
 import scope.TopLevelScope;
 
 import java.io.FileInputStream;
@@ -55,6 +55,12 @@ public class Main {
         var rvGenerator = new RISCVGenerator(irTop);
         rvGenerator.generateRVAssembly();
         var rvTop = rvGenerator.getRvTop();
+
+
+        if (args.length == 0) {
+            rvTop.printRV("fakeOutput");
+        }
+
         new RegisterAllocator(rvTop).allocate();
         //new AddrValidator(rvTop).validate();
         if (args.length == 0) {

@@ -4,6 +4,7 @@ import riscv.RVFunction;
 import riscv.register.REGISTER;
 import riscv.register.VIRTUAL;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -23,6 +24,26 @@ public class SetZ extends Instruction {
                         RVFunction function) {
         cond = super.resolveSrc(virtualMap, itr, cond, 3);
         dest = super.resolveDest(virtualMap, itr, dest, function,5);
+    }
+
+    @Override
+    public HashSet<REGISTER> getDefs() {
+        return new HashSet<>() {{ add(dest); }};
+    }
+
+    @Override
+    public HashSet<REGISTER> getUses() {
+        return new HashSet<>() {{ add(cond); }};
+    }
+
+    @Override
+    public void replaceUse(REGISTER old, REGISTER newReg) {
+        if (cond == old) cond = newReg;
+    }
+
+    @Override
+    public void replaceRd(REGISTER old, REGISTER newReg) {
+        if (dest == old) dest = newReg;
     }
 
     @Override

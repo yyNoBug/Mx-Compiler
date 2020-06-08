@@ -3,9 +3,9 @@ package riscv.instruction;
 import riscv.RVFunction;
 import riscv.addr.Address;
 import riscv.register.REGISTER;
-import riscv.register.SPILLED;
 import riscv.register.VIRTUAL;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -19,14 +19,15 @@ abstract public class Instruction {
                               ListIterator<Instruction> itr, REGISTER src, int n) {
         REGISTER ret = src;
         if (ret instanceof VIRTUAL) {
-            ret = virtualMap.get(ret);
+           // ret = virtualMap.get(ret);
+            ret = src.color;
         }
-        if (ret instanceof SPILLED) {
+        /*if (ret instanceof SPILLED) {
             itr.previous();
             itr.add(new LOAD(REGISTER.temps[n], ((SPILLED) ret).getAddr()));
             itr.next();
             ret = REGISTER.temps[n];
-        }
+        }*/
         return ret;
     }
 
@@ -34,7 +35,7 @@ abstract public class Instruction {
                                    REGISTER dest, RVFunction function, int n) {
         REGISTER ret = dest;
         if (ret instanceof VIRTUAL) {
-            if (virtualMap.containsKey(ret)) {
+            /*if (virtualMap.containsKey(ret)) {
                 ret = virtualMap.get(ret);
                 if (ret instanceof SPILLED) {
                     itr.add(new STORE(REGISTER.temps[n], ((SPILLED) ret).getAddr()));
@@ -46,7 +47,8 @@ abstract public class Instruction {
                 virtualMap.put(((VIRTUAL) ret), spilled);
                 ret = REGISTER.temps[n];
                 itr.add(new STORE(ret, spilled.getAddr()));
-            }
+            }*/
+            ret = dest.color;
         }
         return ret;
     }
@@ -55,13 +57,14 @@ abstract public class Instruction {
                                    ListIterator<Instruction> itr, Address addr, int n) {
         REGISTER tmp = addr.getBase();
         if (tmp instanceof VIRTUAL) {
-            tmp = virtualMap.get(tmp);
+            addr.setBase(tmp.color);
+            /*tmp = virtualMap.get(tmp);
             if (tmp instanceof SPILLED) {
                 itr.previous();
                 itr.add(new LOAD(REGISTER.temps[n], ((SPILLED) tmp).getAddr()));
                 itr.next();
                 addr.setBase(REGISTER.temps[n]);
-            }
+            }*/
         }
     }
 
@@ -75,5 +78,21 @@ abstract public class Instruction {
             itr.next();
             return new Address(base, 0);
         } else return addr;
+    }
+
+    public HashSet<REGISTER> getDefs() {
+        return new HashSet<>();
+    }
+
+    public HashSet<REGISTER> getUses() {
+        return new HashSet<>();
+    }
+
+    public void replaceUse(REGISTER old, REGISTER newReg) {
+        assert false;
+    }
+
+    public void replaceRd(REGISTER old, REGISTER newReg) {
+        assert false;
     }
 }

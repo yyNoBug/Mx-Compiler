@@ -24,12 +24,17 @@ public class RVTop {
                     writer = new PrintWriter(System.out);
                     break;
                 case "debug": {
-                    FileWriter fileWriter = new FileWriter("builtin/output.s");
+                    FileWriter fileWriter = new FileWriter("builtin/test.s");
+                    writer = new PrintWriter(fileWriter);
+                    break;
+                }
+                case "fakeOutput": {
+                    FileWriter fileWriter = new FileWriter("builtin/" + mode + ".s");
                     writer = new PrintWriter(fileWriter);
                     break;
                 }
                 case "codegen": {
-                    FileWriter fileWriter = new FileWriter("output.s");
+                    FileWriter fileWriter = new FileWriter("test.s");
                     writer = new PrintWriter(fileWriter);
                     break;
                 }

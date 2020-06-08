@@ -5,6 +5,7 @@ import riscv.RVFunction;
 import riscv.register.REGISTER;
 import riscv.register.VIRTUAL;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -25,6 +26,17 @@ public class BR extends Instruction {
                         RVFunction function) {
         lhs = super.resolveSrc(virtualMap, itr, lhs, 3);
         rhs = super.resolveSrc(virtualMap, itr, rhs, 4);
+    }
+
+    @Override
+    public HashSet<REGISTER> getUses() {
+        return new HashSet<>(){{add(lhs); add(rhs);}};
+    }
+
+    @Override
+    public void replaceUse(REGISTER old, REGISTER newReg) {
+        if (lhs == old) lhs = newReg;
+        if (rhs == old) rhs = newReg;
     }
 
     @Override

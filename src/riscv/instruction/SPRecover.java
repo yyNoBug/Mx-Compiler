@@ -4,6 +4,7 @@ import riscv.RVFunction;
 import riscv.register.REGISTER;
 import riscv.register.VIRTUAL;
 
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -17,6 +18,16 @@ public class SPRecover extends Instruction {
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
 
+    }
+
+    @Override
+    public HashSet<REGISTER> getDefs() {
+        return new HashSet<>(){{add(REGISTER.sp);}};
+    }
+
+    @Override
+    public HashSet<REGISTER> getUses() {
+        return new HashSet<>(){{add(REGISTER.sp);}};
     }
 
     @Override

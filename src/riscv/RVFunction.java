@@ -25,7 +25,7 @@ public class RVFunction {
     }
 
     public int getSize() {
-        return ((top + bottom) * 4 - 1) / 16 * 16 + 16;
+        return ((top + bottom) * 4 + 15) / 16 * 16;
     }
 
     public int getTopIndex(){
