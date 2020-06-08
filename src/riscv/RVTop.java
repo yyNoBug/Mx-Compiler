@@ -24,7 +24,7 @@ public class RVTop {
                     writer = new PrintWriter(System.out);
                     break;
                 case "debug": {
-                    FileWriter fileWriter = new FileWriter("builtin/test.s");
+                    FileWriter fileWriter = new FileWriter("builtin/output.s");
                     writer = new PrintWriter(fileWriter);
                     break;
                 }
@@ -34,7 +34,7 @@ public class RVTop {
                     break;
                 }
                 case "codegen": {
-                    FileWriter fileWriter = new FileWriter("test.s");
+                    FileWriter fileWriter = new FileWriter("output.s");
                     writer = new PrintWriter(fileWriter);
                     break;
                 }

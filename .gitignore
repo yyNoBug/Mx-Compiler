@@ -1,5 +1,5 @@
 /antlr/antlr-4.8-complete.jar
-/builtin/test.s
+/builtin/output.s
 /bin/*
 /out/
 test.txt
