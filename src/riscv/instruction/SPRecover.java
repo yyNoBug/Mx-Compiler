@@ -32,6 +32,8 @@ public class SPRecover extends Instruction {
 
     @Override
     public String toString() {
-        return "\taddi\t" + REGISTER.sp + "," + REGISTER.sp + "," + function.getSize();
+        if (function.getSize() < 2048) return "\taddi\t" + REGISTER.sp + "," + REGISTER.sp + "," + function.getSize();
+        else return "\tli\t" + REGISTER.temps[0] + "," + function.getSize() + "\n"
+                + "\tadd\t" + REGISTER.sp + "," + REGISTER.sp + "," + REGISTER.temps[0];
     }
 }
