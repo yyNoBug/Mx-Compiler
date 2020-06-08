@@ -50,6 +50,8 @@ public class RegisterAllocator {
     }
 
 
+    int K;
+
     HashSet<REGISTER> preColored = new LinkedHashSet<>();
     HashSet<REGISTER> initial = new LinkedHashSet<>();
     HashSet<REGISTER> simplifyWorkList = new LinkedHashSet<>();
@@ -60,8 +62,6 @@ public class RegisterAllocator {
     HashSet<REGISTER> coloredNodes = new LinkedHashSet<>();
     HashSet<Edge> adjSet = new LinkedHashSet<>();
     Stack<REGISTER> selectStack = new Stack<>();
-
-    int K;
 
     HashSet<MV> coalescedMoves = new LinkedHashSet<>();
     HashSet<MV> constrainedMoves = new LinkedHashSet<>();
@@ -132,7 +132,7 @@ public class RegisterAllocator {
     private void build() {
         for (RVBlock block : curFunction.getBlocks()) {
             HashSet<REGISTER> currentLive = new LinkedHashSet<>(block.liveOut);
-//            System.err.println(currentLive); // TODO
+            // System.err.println("===" + block + currentLive); // TODO
             for (int i = block.getInstructions().size() - 1; i >= 0; --i) {
                 var inst = block.getInstructions().get(i);
                 if (inst instanceof MV) {
@@ -148,12 +148,13 @@ public class RegisterAllocator {
                     addEdge(((SG) inst).getRd(), ((SG) inst).getRt());
                 }
                 HashSet<REGISTER> defs = inst.getDefs();
-                //currentLive.add(root.pRegs.get(0)); //????
+                // currentLive.add(REGISTER.zero); // ????
                 currentLive.addAll(defs);
+                // System.err.println(currentLive); // TODO
                 for (REGISTER def : defs) {
                     for (REGISTER reg : currentLive) {
                         addEdge(reg, def);
-                        //System.err.println(reg + " " + def); // TODO
+                        // System.err.println(reg + " " + def); // TODO
                     }
                 }
                 currentLive.removeAll(defs);

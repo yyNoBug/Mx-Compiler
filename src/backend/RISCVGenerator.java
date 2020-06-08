@@ -13,7 +13,6 @@ import riscv.addr.ParaPassAddr;
 import riscv.addr.StackAddr;
 import riscv.instruction.*;
 import riscv.register.REGISTER;
-import riscv.register.SPILLED;
 import riscv.register.VIRTUAL;
 
 import java.util.LinkedHashMap;
@@ -123,8 +122,10 @@ public class RISCVGenerator implements IRVisitor {
             if (i == 8) break;
         }
         for (; i < function.getArgs().size(); ++i) {
-            regMap.put(function.getArgs().get(i),
-                    new SPILLED(new ParaCallAddr(i)));
+            var temp = new VIRTUAL();
+            curBlock.add(new LOAD(temp, new ParaCallAddr(i)));
+            regMap.put(function.getArgs().get(i), temp);
+            //regMap.put(function.getArgs().get(i), new SPILLED(new ParaCallAddr(i)));
         }
 
         //curBlock.add(new STORE(REGISTER.ra, new StackAddr(curFunction, curFunction.getTopIndex())));
@@ -135,6 +136,10 @@ public class RISCVGenerator implements IRVisitor {
             phyRegMap.put(reg, temp);
             curBlock.add(new MV(temp, reg));
         }
+
+        var entryBlock = blkMap.get(function.getBlockList().get(0));
+        curBlock.successors.add(entryBlock);
+        entryBlock.precursors.add(curBlock);
 
         function.getBlockList().forEach(x -> visit(x));
 
