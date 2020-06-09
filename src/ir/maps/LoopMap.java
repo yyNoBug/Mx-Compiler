@@ -15,7 +15,7 @@ public class LoopMap {
         mapOfEnd.put(node, end);
     }
 
-    public Block getBody(ASTNode node){
+    public Block getStep(ASTNode node){
         return mapOfBody.get(node);
     }
 

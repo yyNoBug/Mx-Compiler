@@ -290,7 +290,7 @@ public class IRBuilder implements ASTVisitor {
         Block stepBlock = new Block("for." + forCount + ".step");
         Block endBlock = new Block("for." + forCount + ".end");
         forCount++;
-        loopMap.put(node, conditionBlock, endBlock);
+        loopMap.put(node, stepBlock, endBlock);
         curBlock.add(new JmpStmt(conditionBlock));
 
         enterBlock(conditionBlock);
@@ -312,7 +312,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ContinueStatementNode node) {
-        curBlock.add(new JmpStmt(loopMap.getBody(node.getLoopNode())));
+        curBlock.add(new JmpStmt(loopMap.getStep(node.getLoopNode())));
     }
 
     @Override
