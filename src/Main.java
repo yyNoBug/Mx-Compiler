@@ -3,6 +3,7 @@ import backend.RISCVGenerator;
 import backend.RegisterAllocator;
 import frontend.*;
 import optimize.Mem2Reg;
+import optimize.PeepHole;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -67,11 +68,14 @@ public class Main {
 
         new RegisterAllocator(rvTop).allocate();
         //new AddrValidator(rvTop).validate();
+        new PeepHole(rvTop);
+
         if (args.length == 0) {
             rvTop.printRV("debug");
         } else {
             rvTop.printRV(args[0]);
         }
+
     }
 
 }

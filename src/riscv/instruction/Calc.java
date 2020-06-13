@@ -19,6 +19,22 @@ public class Calc extends Instruction {
         this.rhs = rhs;
     }
 
+    public OpClass.Op getOp() {
+        return op;
+    }
+
+    public REGISTER getDest() {
+        return dest;
+    }
+
+    public REGISTER getLhs() {
+        return lhs;
+    }
+
+    public REGISTER getRhs() {
+        return rhs;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {

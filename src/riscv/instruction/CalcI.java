@@ -20,6 +20,22 @@ public class CalcI extends Instruction {
         this.imm = imm;
     }
 
+    public OpClass.Op getOp() {
+        return op;
+    }
+
+    public REGISTER getDest() {
+        return dest;
+    }
+
+    public REGISTER getLhs() {
+        return lhs;
+    }
+
+    public int getImm() {
+        return imm;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {

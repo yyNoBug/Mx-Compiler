@@ -15,6 +15,10 @@ public class J extends Instruction {
         this.dest = dest;
     }
 
+    public RVBlock getDest() {
+        return dest;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
 

@@ -17,6 +17,14 @@ public class LI extends Instruction {
         this.imm = imm;
     }
 
+    public REGISTER getReg() {
+        return reg;
+    }
+
+    public int getImm() {
+        return imm;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr,
                         RVFunction function) {

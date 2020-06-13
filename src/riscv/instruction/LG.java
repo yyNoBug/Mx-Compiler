@@ -18,6 +18,14 @@ public class LG extends Instruction {
         this.global = global;
     }
 
+    public REGISTER getReg() {
+        return reg;
+    }
+
+    public RVGlobal getGlobal() {
+        return global;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
         reg = super.resolveDest(virtualMap, itr, reg, function, 3);

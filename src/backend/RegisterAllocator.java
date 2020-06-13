@@ -500,7 +500,7 @@ public class RegisterAllocator {
         curFunction = function;
         while (true) {
             init();
-            LivenessAnalysis.runForFunction(function);
+            new LivenessAnalysis(function);
             build();
             makeWorklist();
             do{

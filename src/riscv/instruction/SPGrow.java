@@ -15,6 +15,10 @@ public class SPGrow extends Instruction {
         this.function = function;
     }
 
+    public RVFunction getFunction() {
+        return function;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
 

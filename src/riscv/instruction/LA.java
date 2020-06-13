@@ -18,6 +18,14 @@ public class LA extends Instruction {
         this.str = str;
     }
 
+    public REGISTER getReg() {
+        return reg;
+    }
+
+    public RVString getStr() {
+        return str;
+    }
+
     @Override
     public void resolve(Map<VIRTUAL, REGISTER> virtualMap, ListIterator<Instruction> itr, RVFunction function) {
         reg = super.resolveDest(virtualMap, itr, reg, function, 5);

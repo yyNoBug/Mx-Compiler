@@ -9,11 +9,24 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class LivenessAnalysis {
-    static HashMap<RVBlock, HashSet<REGISTER>> blockUses;
-    static HashMap<RVBlock, HashSet<REGISTER>> blockDefs;
-    static HashSet<RVBlock> visited;
+    private RVFunction function;
 
-    static void runForBlock(RVBlock block) {
+    private HashMap<RVBlock, HashSet<REGISTER>> blockUses = new HashMap<>();
+    private HashMap<RVBlock, HashSet<REGISTER>> blockDefs = new HashMap<>();
+    private HashSet<RVBlock> visited = new HashSet<>();
+
+    public LivenessAnalysis(RVFunction function) {
+        this.function = function;
+        deal();
+    }
+
+    private void deal() {
+        function.getBlocks().forEach(this::visit);
+        var exitBlock = function.getBlocks().get(function.getBlocks().size() - 1);
+        iterateInOut(exitBlock);
+    }
+
+    private void visit(RVBlock block) {
         HashSet<REGISTER> uses = new HashSet<>();
         HashSet<REGISTER> defs = new HashSet<>();
         for (Instruction instruction : block.getInstructions()) {
@@ -29,7 +42,7 @@ public class LivenessAnalysis {
         block.liveOut = new HashSet<>();
     }
 
-    static void runBackward(RVBlock block) {
+    private void iterateInOut(RVBlock block) {
         if (visited.contains(block)) return;
         visited.add(block);
         HashSet<REGISTER> liveOut = new HashSet<>();
@@ -47,27 +60,9 @@ public class LivenessAnalysis {
         }
         //System.err.println("pre:=====  " + block  + " " + block.precursors);
         for (RVBlock precursor : block.precursors) {
-            runBackward(precursor);
+            iterateInOut(precursor);
         }
     }
 
-    public static void runForFunction(RVFunction function) {
-        blockUses = new HashMap<>();
-        blockDefs = new HashMap<>();
-        visited = new HashSet<>();
-        function.getBlocks().forEach(LivenessAnalysis::runForBlock);
-        var exitBlock = function.getBlocks().get(function.getBlocks().size() - 1);
-        runBackward(exitBlock);
 
-//        System.err.println("==== blocks ====");
-//        function.getBlocks().forEach(x -> {
-//            System.err.println(x + "\nlive in:");
-//            System.err.println(x.liveIn);
-//            //x.liveIn.forEach(System.err::println);
-//            System.err.println("live out:");
-//            System.err.println(x.liveOut);
-//        });
-//        System.err.println("==== end =====");
-         //TODO
-    }
 }
