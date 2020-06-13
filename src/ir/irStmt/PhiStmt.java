@@ -5,6 +5,7 @@ import ir.IRVisitor;
 import ir.items.Item;
 import ir.items.Local;
 
+import java.util.HashSet;
 import java.util.Map;
 
 public class PhiStmt extends Statement {
@@ -22,6 +23,11 @@ public class PhiStmt extends Statement {
 
     public Map<Block, Item> getMap() {
         return map;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return null;
     }
 
     @Override

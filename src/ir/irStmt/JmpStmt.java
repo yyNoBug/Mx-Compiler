@@ -2,6 +2,9 @@ package ir.irStmt;
 
 import ir.Block;
 import ir.IRVisitor;
+import ir.items.Item;
+
+import java.util.HashSet;
 
 public class JmpStmt extends TerminalStmt {
     private Block destination;
@@ -12,6 +15,11 @@ public class JmpStmt extends TerminalStmt {
 
     public Block getDestination() {
         return destination;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>();
     }
 
     @Override

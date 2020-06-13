@@ -3,6 +3,9 @@ package ir;
 import ir.items.Global;
 import ir.items.StringConst;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,5 +36,31 @@ public class IRTop {
 
     public void add(DeclaredFunction function) {
         functions.add(function);
+    }
+
+    public void printIR(String filename){
+        try {
+            FileWriter fileWriter = new FileWriter(filename);
+            PrintWriter writer = new PrintWriter(fileWriter);
+
+            for (Global global : globals) {
+                writer.println("global " + global);
+            }
+
+            for (StringConst str : strs) {
+                writer.println("string " + str + " = \"" + str.getEscapedString() + "\"");
+            }
+
+            writer.println();
+
+            for (DeclaredFunction function : functions) {
+                function.printIR(writer);
+                writer.println();
+            }
+
+            writer.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }

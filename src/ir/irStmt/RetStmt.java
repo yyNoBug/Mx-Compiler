@@ -3,6 +3,8 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashSet;
+
 public class RetStmt extends TerminalStmt {
     private Item item;
 
@@ -12,6 +14,15 @@ public class RetStmt extends TerminalStmt {
 
     public Item getItem() {
         return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>();
     }
 
     @Override

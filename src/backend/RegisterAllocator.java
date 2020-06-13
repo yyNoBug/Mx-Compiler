@@ -36,7 +36,6 @@ public class RegisterAllocator {
     }
 
     private void addEdge(REGISTER u, REGISTER v) {
-        //System.err.println(u + " " + v);
         if (u != v && !adjSet.contains(new Edge(u, v))) {
             adjSet.add(new Edge(u, v));
             adjSet.add(new Edge(v, u));
@@ -48,7 +47,6 @@ public class RegisterAllocator {
             }
         }
     }
-
 
     int K;
 
@@ -110,6 +108,13 @@ public class RegisterAllocator {
         adjSet.clear();
         curFunction.getBlocks().forEach(block -> {
             for (Instruction inst : block.getInstructions()) {
+                for (REGISTER def : inst.getDefs()) {
+                    if (def == null) throw new RuntimeException();
+                }
+                for (REGISTER def : inst.getUses()) {
+                    if (def == null) throw new RuntimeException();
+                }
+
                 initial.addAll(inst.getDefs());
                 initial.addAll(inst.getUses());
             }

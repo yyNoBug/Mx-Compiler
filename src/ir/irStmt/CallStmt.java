@@ -6,6 +6,7 @@ import ir.items.Item;
 import ir.items.Local;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class CallStmt extends YyStmt {
     private Function function;
@@ -28,6 +29,13 @@ public class CallStmt extends YyStmt {
 
     public ArrayList<Item> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>() {{
+            this.addAll(parameters);
+        }};
     }
 
     @Override

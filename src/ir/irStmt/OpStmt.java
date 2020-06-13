@@ -3,6 +3,8 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashSet;
+
 public class OpStmt extends YyStmt {
     public enum Op {
         PLUS, MINUS, MUL, DIV, MOD,
@@ -34,6 +36,22 @@ public class OpStmt extends YyStmt {
 
     public Item getResult() {
         return result;
+    }
+
+    public void setOpr1(Item opr1) {
+        this.opr1 = opr1;
+    }
+
+    public void setOpr2(Item opr2) {
+        this.opr2 = opr2;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>() {{
+            add(opr1);
+            add(opr2);
+        }};
     }
 
     @Override

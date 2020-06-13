@@ -19,7 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class IRBuilder implements ASTVisitor {
@@ -186,7 +186,6 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(ClassDeclNode node) {
         if (node.getConstructor() != null) node.getConstructor().accept(this);
-        // node.getMemberVars().forEach(x->x.accept(this));
         node.getMemberFuns().forEach(x->x.accept(this));
     }
 
@@ -612,10 +611,22 @@ public class IRBuilder implements ASTVisitor {
 
             enterBlock(end);
             Local ret = new Local();
-            if (node.getOp() == BinaryExprNode.Op.LOGIC_AND)
-                curBlock.add(new PhiStmt(ret, Map.of(first, new NumConst(0), second, rhs)));
-            else
-                curBlock.add(new PhiStmt(ret, Map.of(first, new NumConst(1), second, rhs)));
+            if (node.getOp() == BinaryExprNode.Op.LOGIC_AND) {
+                var map = new HashMap<Block, Item>(){{
+                   put(first, new NumConst(0));
+                   put(second, rhs);
+                }};
+                curBlock.add(new PhiStmt(ret, map));
+                //curBlock.add(new PhiStmt(ret, Map.of(first, new NumConst(0), second, rhs)));
+            }
+            else {
+                var map = new HashMap<Block, Item>(){{
+                    put(first, new NumConst(1));
+                    put(second, rhs);
+                }};
+                curBlock.add(new PhiStmt(ret, map));
+                //curBlock.add(new PhiStmt(ret, Map.of(first, new NumConst(1), second, rhs)));
+            }
             curReg = ret;
             shortCount++;
             return;

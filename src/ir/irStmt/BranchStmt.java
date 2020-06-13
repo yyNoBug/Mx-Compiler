@@ -4,6 +4,8 @@ import ir.Block;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashSet;
+
 public class BranchStmt extends TerminalStmt {
     private Item condition;
     private Block thenBlock;
@@ -25,6 +27,17 @@ public class BranchStmt extends TerminalStmt {
 
     public Block getElseBlock() {
         return elseBlock;
+    }
+
+    public void setCondition(Item condition) {
+        this.condition = condition;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>() {{
+            add(condition);
+        }};
     }
 
     @Override

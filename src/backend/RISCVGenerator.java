@@ -93,7 +93,14 @@ public class RISCVGenerator implements IRVisitor {
             return ret;
         }
         if (item instanceof Local) {
-            return regMap.get(item);
+            return regMap.computeIfAbsent(item, x -> new VIRTUAL());
+            /*
+            var ret = regMap.get(item);
+            if (ret == null) {
+                ret = new VIRTUAL();
+                regMap.put(item, ret);
+            }
+            return ret;*/
         }
         return null;
     }
@@ -116,15 +123,17 @@ public class RISCVGenerator implements IRVisitor {
 
         int i = 0;
         for (Item arg : function.getArgs()) {
-            var temp = new VIRTUAL();
-            curBlock.add(new MV(temp, REGISTER.args[i++]));
-            regMap.put(arg, temp);
+            //var temp = new VIRTUAL();
+            //curBlock.add(new MV(temp, REGISTER.args[i++]));
+            curBlock.add(new MV(createReg(arg), REGISTER.args[i++]));
+            //regMap.put(arg, temp);
             if (i == 8) break;
         }
         for (; i < function.getArgs().size(); ++i) {
-            var temp = new VIRTUAL();
-            curBlock.add(new LOAD(temp, new ParaCallAddr(i)));
-            regMap.put(function.getArgs().get(i), temp);
+//            var temp = new VIRTUAL();
+//            curBlock.add(new LOAD(temp, new ParaCallAddr(i)));
+            curBlock.add(new LOAD(createReg(function.getArgs().get(i)), new ParaCallAddr(i)));
+//            regMap.put(function.getArgs().get(i), temp);
             //regMap.put(function.getArgs().get(i), new SPILLED(new ParaCallAddr(i)));
         }
 
@@ -219,9 +228,10 @@ public class RISCVGenerator implements IRVisitor {
         }
         curBlock.add(new Call(stmt.getSymbol(), size));
         if (stmt.getResult() != null) {
-            var dest = new VIRTUAL();
-            regMap.put(stmt.getResult(), dest);
-            curBlock.add(new MV(dest, REGISTER.args[0]));
+            //var dest = new VIRTUAL();
+            //regMap.put(stmt.getResult(), dest);
+            //curBlock.add(new MV(dest, REGISTER.args[0]));
+            curBlock.add(new MV(createReg(stmt.getResult()), REGISTER.args[0]));
         }
     }
 
@@ -241,8 +251,9 @@ public class RISCVGenerator implements IRVisitor {
 
     @Override
     public void visit(LoadStmt stmt) {
-        var dest = new VIRTUAL();
-        regMap.put(stmt.getDest(), dest);
+//        var dest = new VIRTUAL();
+        var dest = createReg(stmt.getDest());
+//        regMap.put(stmt.getDest(), dest);
 
         if (stmt.getSrc() instanceof Global) {
             curBlock.add(new LG(dest, new RVGlobal(((Global) stmt.getSrc()))));
@@ -253,8 +264,9 @@ public class RISCVGenerator implements IRVisitor {
 
     @Override
     public void visit(OpStmt stmt) {
-        var dest = new VIRTUAL();
-        regMap.put(stmt.getResult(), dest);
+//        var dest = new VIRTUAL();
+        var dest = createReg(stmt.getResult());
+//        regMap.put(stmt.getResult(), dest);
 
         var opr1 = stmt.getOpr1();
         var opr2 = stmt.getOpr2();
@@ -334,9 +346,10 @@ public class RISCVGenerator implements IRVisitor {
 
     @Override
     public void visit(PhiStmt stmt) {
-        var dest = new VIRTUAL();
-        regMap.put(stmt.getTarget(), dest);
-        curBlock.add(new MV(dest, phiMap.get(stmt)));
+//        var dest = new VIRTUAL();
+//        regMap.put(stmt.getTarget(), dest);
+//        curBlock.add(new MV(dest, phiMap.get(stmt)));
+        curBlock.add(new MV(createReg(stmt.getTarget()), phiMap.get(stmt)));
     }
 
     @Override

@@ -3,6 +3,8 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashSet;
+
 public class AllocateStmt extends YyStmt {
     private Item item;
 
@@ -12,6 +14,11 @@ public class AllocateStmt extends YyStmt {
 
     public Item getItem() {
         return item;
+    }
+
+    @Override
+    public HashSet<Item> getUses() {
+        return new HashSet<>();
     }
 
     @Override

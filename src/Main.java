@@ -2,6 +2,7 @@ import ast.ProgramNode;
 import backend.RISCVGenerator;
 import backend.RegisterAllocator;
 import frontend.*;
+import optimize.Mem2Reg;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -49,8 +50,10 @@ public class Main {
 
         var irBuilder = new IRBuilder(globalScope);
         irBuilder.visit(programNode);
-        if(args.length == 0) irBuilder.printIR();
         var irTop = irBuilder.getTop();
+        if(args.length == 0) irTop.printIR("ir.out");
+        new Mem2Reg(irTop);
+        if(args.length == 0) irTop.printIR("ssa.out");
 
         var rvGenerator = new RISCVGenerator(irTop);
         rvGenerator.generateRVAssembly();
@@ -60,6 +63,7 @@ public class Main {
         if (args.length == 0) {
             rvTop.printRV("fakeOutput");
         }
+
 
         new RegisterAllocator(rvTop).allocate();
         //new AddrValidator(rvTop).validate();
