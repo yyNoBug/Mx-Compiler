@@ -99,8 +99,10 @@ public class PeepHole {
         for (RVBlock block : function.getBlocks()) {
             Map<REGISTER, Instruction> content = new HashMap<>();
 
+            //System.err.println();
             for (var itr = block.getInstructions().listIterator(); itr.hasNext();) {
                 var inst = itr.next();
+                //System.err.println(inst);
                 boolean modified = false;
                 if (inst instanceof LA) {
                     var lastInst = content.get((((LA) inst).getReg()));
@@ -128,18 +130,13 @@ public class PeepHole {
                     }
                 }
 
-                if (!modified) {
-                    for (REGISTER def : inst.getDefs()) {
-                        content.put(def, inst);
-                    }
-                }
 
-                /*
                 itr.previous();
                 Instruction prevInst = null;
                 if (itr.hasPrevious()) prevInst = itr.previous();
                 while (!modified
                         && prevInst != null
+                        && !(prevInst instanceof SG)
                         && prevInst.getDefs().size() == 1
                         && inst.getDefs().size() == 1
                         && prevInst.getDefs().iterator().next() == inst.getDefs().iterator().next()) {
@@ -160,7 +157,14 @@ public class PeepHole {
                     }
                 }
                 if (prevInst != null) itr.next();
-                itr.next();*/
+                itr.next();
+
+                if (!modified) {
+                    for (REGISTER def : inst.getDefs()) {
+                        content.put(def, inst);
+                    }
+                }
+
             }
         }
     }

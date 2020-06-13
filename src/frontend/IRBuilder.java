@@ -408,8 +408,8 @@ public class IRBuilder implements ASTVisitor {
         leftValueRequireStack.pop();
         Item ind = curReg;
         Local offset = new Local();
-        int size = 4;
-        curBlock.add(new OpStmt(OpStmt.Op.MUL, ind, new NumConst(size), offset));
+        int size = 2;
+        curBlock.add(new OpStmt(OpStmt.Op.LSHIFT, ind, new NumConst(size), offset));
         Local ret = new Local();
         curBlock.add(new OpStmt(OpStmt.Op.PLUS, base, offset, ret));
         if (leftValueRequireStack.empty()) return;

@@ -59,14 +59,13 @@ public class Main {
         var rvGenerator = new RISCVGenerator(irTop);
         rvGenerator.generateRVAssembly();
         var rvTop = rvGenerator.getRvTop();
+        new RegisterAllocator(rvTop).allocate();
 
 
         if (args.length == 0) {
             rvTop.printRV("fakeOutput");
         }
 
-
-        new RegisterAllocator(rvTop).allocate();
         //new AddrValidator(rvTop).validate();
         new PeepHole(rvTop);
 
