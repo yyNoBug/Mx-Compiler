@@ -165,9 +165,28 @@ public class PeepHole {
         }
     }
 
+    private void removeUnnecessaryJmp (RVFunction function){
+
+        for (var itr = function.getBlocks().listIterator(); itr.hasNext(); ) {
+            RVBlock block = itr.next();
+            //for (RVBlock block : function.getBlocks()) {
+            if (block.getInstructions().isEmpty() || !itr.hasNext()) {
+                continue;
+            }
+            RVBlock nextBlock = itr.next();
+            itr.previous();
+            var terminalStmt = block.getInstructions().get(block.getInstructions().size() - 1);
+            if (terminalStmt instanceof J && ((J) terminalStmt).getDest() == nextBlock) {
+                block.getInstructions().remove(block.getInstructions().size() - 1);
+            }
+        }
+
+    }
+
     private void deal(RVFunction function) {
         removeUnnecessaryMoves(function);
         combineBlocks(function);
         removeRedundantLoad(function);
+        removeUnnecessaryJmp(function);
     }
 }

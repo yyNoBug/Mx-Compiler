@@ -79,6 +79,7 @@ public class FunctionInline {
         }
         for (Node node : nodeMap.values()) {
             // Unfold recursive function.
+            //unfoldFunction(node, node);
         }
     }
 
