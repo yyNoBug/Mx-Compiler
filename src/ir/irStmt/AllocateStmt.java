@@ -3,6 +3,7 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class AllocateStmt extends YyStmt {
@@ -14,6 +15,11 @@ public class AllocateStmt extends YyStmt {
 
     public Item getItem() {
         return item;
+    }
+
+    @Override
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        return null;
     }
 
     @Override

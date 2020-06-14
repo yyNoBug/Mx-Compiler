@@ -3,6 +3,7 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class RetStmt extends TerminalStmt {
@@ -18,6 +19,12 @@ public class RetStmt extends TerminalStmt {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        Item newItem = item;
+        if (itemMap.containsKey(item)) newItem = itemMap.get(item);
+        return new RetStmt(newItem);
     }
 
     @Override

@@ -94,13 +94,6 @@ public class RISCVGenerator implements IRVisitor {
         }
         if (item instanceof Local) {
             return regMap.computeIfAbsent(item, x -> new VIRTUAL());
-            /*
-            var ret = regMap.get(item);
-            if (ret == null) {
-                ret = new VIRTUAL();
-                regMap.put(item, ret);
-            }
-            return ret;*/
         }
         return null;
     }

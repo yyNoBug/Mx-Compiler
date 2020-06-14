@@ -2,6 +2,7 @@ import ast.ProgramNode;
 import backend.RISCVGenerator;
 import backend.RegisterAllocator;
 import frontend.*;
+import optimize.FunctionInline;
 import optimize.Mem2Reg;
 import optimize.PeepHole;
 import org.antlr.v4.runtime.CharStreams;
@@ -55,6 +56,8 @@ public class Main {
         if(args.length == 0) irTop.printIR("ir.out");
         new Mem2Reg(irTop);
         if(args.length == 0) irTop.printIR("ssa.out");
+        new FunctionInline(irTop);
+        if(args.length == 0) irTop.printIR("functionInline.out");
 
         var rvGenerator = new RISCVGenerator(irTop);
         rvGenerator.generateRVAssembly();

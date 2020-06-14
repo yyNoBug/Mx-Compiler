@@ -4,7 +4,9 @@ import ir.Block;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class BranchStmt extends TerminalStmt {
     private Item condition;
@@ -31,6 +33,19 @@ public class BranchStmt extends TerminalStmt {
 
     public void setCondition(Item condition) {
         this.condition = condition;
+    }
+
+    @Override
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        Item newCondition = condition;
+        if (itemMap.containsKey(condition)) newCondition = itemMap.get(condition);
+        return new BranchStmt(newCondition, thenBlock, elseBlock);
+    }
+
+    @Override
+    public void translateTarget(Map<Block, Block> map) {
+        if (map.containsKey(thenBlock)) thenBlock = map.get(thenBlock);
+        if (map.containsKey(elseBlock)) elseBlock = map.get(elseBlock);
     }
 
     @Override

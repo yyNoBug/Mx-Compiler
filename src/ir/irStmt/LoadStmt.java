@@ -3,6 +3,7 @@ package ir.irStmt;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class LoadStmt extends YyStmt {
@@ -24,6 +25,14 @@ public class LoadStmt extends YyStmt {
 
     public void setSrc(Item src) {
         this.src = src;
+    }
+
+    @Override
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        Item newSrc = src, newDest = dest;
+        if (itemMap.containsKey(src)) newSrc = itemMap.get(src);
+        if (itemMap.containsKey(dest)) newDest = itemMap.get(dest);
+        return new LoadStmt(newSrc, newDest);
     }
 
     @Override

@@ -6,6 +6,7 @@ import ir.items.Item;
 import ir.items.Local;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class CallStmt extends YyStmt {
@@ -19,6 +20,10 @@ public class CallStmt extends YyStmt {
         this.result = result;
     }
 
+    public Function getFunction() {
+        return function;
+    }
+
     public String getSymbol() {
         return function.getName();
     }
@@ -29,6 +34,18 @@ public class CallStmt extends YyStmt {
 
     public ArrayList<Item> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        Local newResult = result;
+        if (itemMap.containsKey(result)) newResult = (Local) itemMap.get(result);
+
+        ArrayList<Item> newParameters = new ArrayList<>();
+        for (Item parameter : parameters) {
+            newParameters.add(itemMap.getOrDefault(parameter, parameter));
+        }
+        return new CallStmt(function, newParameters, newResult);
     }
 
     @Override

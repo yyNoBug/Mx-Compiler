@@ -93,9 +93,6 @@ public class PeepHole {
     }
 
     private void removeRedundantLoad(RVFunction function) {
-        // remove redundant Li, Lui, La
-        // Load and stores are removed in MIR
-
         for (RVBlock block : function.getBlocks()) {
             Map<REGISTER, Instruction> content = new HashMap<>();
 
@@ -129,7 +126,6 @@ public class PeepHole {
                         }
                     }
                 }
-
 
                 itr.previous();
                 Instruction prevInst = null;

@@ -15,9 +15,6 @@ import type.ClassType;
 import type.StringType;
 import type.VoidType;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -42,34 +39,6 @@ public class IRBuilder implements ASTVisitor {
 
     public IRBuilder(TopLevelScope globalScope) {
         BuiltinFunction.setFunctionMap(functionMap, globalScope);
-    }
-
-    public void printIR(){
-        try {
-            FileWriter fileWriter = new FileWriter("ir.out");
-            PrintWriter writer = new PrintWriter(fileWriter);
-            var map = globalMap.getGlobalList();
-            for (Global global : top.getGlobals()) {
-                writer.println("global " + global);
-            }
-
-            for (StringConst str : top.getStrs()) {
-                writer.println("string " + str + " = \"" + str.getEscapedString() + "\"");
-            }
-
-            writer.println();
-
-            var declaredFunctions = top.getFunctions();
-            for (DeclaredFunction function : declaredFunctions) {
-                function.printIR(writer);
-                writer.println();
-            }
-
-            writer.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
     }
 
     public IRTop getTop() {
@@ -353,7 +322,7 @@ public class IRBuilder implements ASTVisitor {
             parameters.add(curReg);
         });
 
-        if (!(node.getFuncExpr().getFuncEntity().getType() instanceof VoidType)){
+        if (!(node.getFuncExpr().getFuncEntity().getReturnType() instanceof VoidType)){
             Local result = new Local();
             curBlock.add(new CallStmt(function, parameters, result));
             curReg = result;

@@ -4,7 +4,9 @@ import ir.Block;
 import ir.IRVisitor;
 import ir.items.Item;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class JmpStmt extends TerminalStmt {
     private Block destination;
@@ -15,6 +17,16 @@ public class JmpStmt extends TerminalStmt {
 
     public Block getDestination() {
         return destination;
+    }
+
+    @Override
+    public Statement transform(HashMap<Item, Item> itemMap) {
+        return new JmpStmt(destination);
+    }
+
+    @Override
+    public void translateTarget(Map<Block, Block> map) {
+        if (map.containsKey(destination)) destination = map.get(destination);
     }
 
     @Override

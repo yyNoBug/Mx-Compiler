@@ -1,15 +1,9 @@
 package ir;
 
-import ir.irStmt.BranchStmt;
-import ir.irStmt.JmpStmt;
-import ir.irStmt.PhiStmt;
-import ir.irStmt.Statement;
+import ir.irStmt.*;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Block {
     private List<Statement> stmtList = new ArrayList<>();
@@ -44,6 +38,7 @@ public class Block {
             phiStmts.add(((PhiStmt) stmt));
             return;
         }
+        if (peak()!= null && peak() instanceof TerminalStmt) return;
         stmtList.add(stmt);
         if (stmt instanceof JmpStmt) {
             var dest = ((JmpStmt) stmt).getDestination();
@@ -75,5 +70,17 @@ public class Block {
         for (Statement statement : stmtList) {
             writer.println("    " + statement);
         }
+    }
+
+    public Block translateTarget(Map<Block, Block> map) {
+        stmtList.forEach(x -> x.translateTarget(map));
+        return this;
+    }
+
+    public Block translatePhiTarget(Map<Block, Block> map) {
+        stmtList.forEach(x -> {
+            if (x instanceof PhiStmt) x.translateTarget(map);
+        });
+        return this;
     }
 }
