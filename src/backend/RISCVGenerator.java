@@ -264,6 +264,203 @@ public class RISCVGenerator implements IRVisitor {
         var opr1 = stmt.getOpr1();
         var opr2 = stmt.getOpr2();
 
+        if (opr1 instanceof NumConst && opr2 instanceof NumConst) {
+            var n1 = ((NumConst) opr1).getValue();
+            var n2 = ((NumConst) opr2).getValue();
+            int ans;
+            boolean success = true;
+            switch (stmt.getOp()) {
+                case PLUS:
+                    ans = n1 + n2;
+                    break;
+                case MINUS:
+                    ans = n1 - n2;
+                    break;
+                case MUL:
+                    ans = n1 * n2;
+                    break;
+                case DIV:
+                    if (n2 == 0) {
+                        success = false;
+                        ans = 0;
+                        break;
+                    }
+                    ans = n1 / n2;
+                    break;
+                case MOD:
+                    ans = n1 % n2;
+                    break;
+                case OR:
+                    ans = n1 | n2;
+                    break;
+                case AND:
+                    ans = n1 & n2;
+                    break;
+                case XOR:
+                    ans = n1 ^ n2;
+                    break;
+                case LSHIFT:
+                    ans = n1 << n2;
+                    break;
+                case ARSHIFT:
+                    ans = n1 >> n2;
+                    break;
+                case RSHIFT:
+                    ans = n1 >>> n2;
+                    break;
+                case EQ:
+                    ans = n1 == n2 ? 1 : 0;
+                    break;
+                case NEQ:
+                    ans = n1 != n2 ? 1 : 0;
+                    break;
+                case GEQ:
+                    ans = n1 >= n2 ? 1: 0;
+                    break;
+                case GTH:
+                    ans = n1 > n2 ? 1 : 0;
+                    break;
+                case LEQ:
+                    ans = n1 <= n2 ? 1 : 0;
+                    break;
+                case LTH:
+                    ans = n1 < n2 ? 1 : 0;
+                    break;
+                default:
+                    success = false;
+                    ans = 0;
+                    break;
+            }
+            if (success) {
+                curBlock.add(new LI(dest, ans));
+                return;
+            }
+        }
+
+        if (opr2 instanceof NumConst && !(opr1 instanceof NumConst)) {
+            int imm = ((NumConst) opr2).getValue();
+            if (imm >= -2047 && imm <= 2047) {
+                switch(stmt.getOp()){
+                    case PLUS:
+                        curBlock.add(new CalcI(OpClass.Op.ADD, dest, createReg(opr1), imm));
+                        return;
+                    case MINUS:
+                        curBlock.add(new CalcI(OpClass.Op.ADD, dest, createReg(opr1), -imm));
+                        return;
+                    case OR:
+                        curBlock.add(new CalcI(OpClass.Op.OR, dest, createReg(opr1), imm));
+                        return;
+                    case AND:
+                        curBlock.add(new CalcI(OpClass.Op.AND, dest, createReg(opr1), imm));
+                        return;
+                    case XOR:
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, createReg(opr1), imm));
+                        return;
+                    case LSHIFT:
+                        curBlock.add(new CalcI(OpClass.Op.SLL, dest, createReg(opr1), imm));
+                        return;
+                    case ARSHIFT:
+                        curBlock.add(new CalcI(OpClass.Op.SRA, dest, createReg(opr1), imm));
+                        return;
+                    case RSHIFT:
+                        curBlock.add(new CalcI(OpClass.Op.SRL, dest, createReg(opr1), imm));
+                        return;
+                    case EQ:
+                        var difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.EQ, dest, difference));
+                        return;
+                    case NEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.NEQ, dest, difference));
+                        return;
+                    case GEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        var opposite = new VIRTUAL();
+                        curBlock.add(new SetZ(OpClass.Cmp.LT, opposite, difference));
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, opposite, 1));
+                        return;
+                    case GTH:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.GT, dest, difference));
+                        return;
+                    case LEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        opposite = new VIRTUAL();
+                        curBlock.add(new SetZ(OpClass.Cmp.GT, opposite, difference));
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, opposite, 1));
+                        return;
+                    case LTH:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr1), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.LT, dest, difference));
+                        return;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        if (opr1 instanceof NumConst && !(opr2 instanceof NumConst)) {
+            int imm = ((NumConst) opr1).getValue();
+            if (imm >= -2047 && imm <= 2047) {
+                switch(stmt.getOp()){
+                    case PLUS:
+                        curBlock.add(new CalcI(OpClass.Op.ADD, dest, createReg(opr2), imm));
+                        return;
+                    case OR:
+                        curBlock.add(new CalcI(OpClass.Op.OR, dest, createReg(opr2), imm));
+                        return;
+                    case AND:
+                        curBlock.add(new CalcI(OpClass.Op.AND, dest, createReg(opr2), imm));
+                        return;
+                    case XOR:
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, createReg(opr2), imm));
+                        return;
+                    case EQ:
+                        var difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.EQ, dest, difference));
+                        return;
+                    case NEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.NEQ, dest, difference));
+                        return;
+                    case LTH:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        var opposite = new VIRTUAL();
+                        curBlock.add(new SetZ(OpClass.Cmp.LT, opposite, difference));
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, opposite, 1));
+                        return;
+                    case LEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.GT, dest, difference));
+                        return;
+                    case GTH:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        opposite = new VIRTUAL();
+                        curBlock.add(new SetZ(OpClass.Cmp.GT, opposite, difference));
+                        curBlock.add(new CalcI(OpClass.Op.XOR, dest, opposite, 1));
+                        return;
+                    case GEQ:
+                        difference = new VIRTUAL();
+                        curBlock.add(new CalcI(OpClass.Op.ADD, difference, createReg(opr2), -imm));
+                        curBlock.add(new SetZ(OpClass.Cmp.LT, dest, difference));
+                        return;
+                    default:
+                        break;
+                }
+            }
+        }
+
         switch(stmt.getOp()){
             case PLUS:
                 curBlock.add(new Calc(OpClass.Op.ADD, dest, createReg(opr1), createReg(opr2)));

@@ -203,7 +203,6 @@ public class PeepHole {
                 block.getInstructions().remove(block.getInstructions().size() - 1);
             }
         }
-
     }
 
     private void deal(RVFunction function) {
