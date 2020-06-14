@@ -155,12 +155,35 @@ public class PeepHole {
                 if (prevInst != null) itr.next();
                 itr.next();
 
+                /*
+                itr.previous();
+                prevInst = null;
+                if (itr.hasPrevious()) prevInst = itr.previous();
+                while (!modified
+                        && prevInst instanceof LI
+                        && inst instanceof Calc
+                        && inst.getDefs().contains(((LI) prevInst).getReg())
+                        && ((LI) prevInst).getImm() < 2048
+                        && ((LI) prevInst).getImm() >= -2048) {
+
+                    itr.remove();
+                    itr.next();
+                    itr.remove();
+
+                    itr.add(new CalcI(((Calc) inst).getOp(), ((Calc) inst).getDest(), ));
+                    itr.previous();
+                    if (itr.hasPrevious()) prevInst = itr.previous();
+                    else prevInst = null;
+                }
+                if (prevInst != null) itr.next();
+                itr.next();
+                */
+
                 if (!modified) {
                     for (REGISTER def : inst.getDefs()) {
                         content.put(def, inst);
                     }
                 }
-
             }
         }
     }
@@ -169,7 +192,7 @@ public class PeepHole {
 
         for (var itr = function.getBlocks().listIterator(); itr.hasNext(); ) {
             RVBlock block = itr.next();
-            //for (RVBlock block : function.getBlocks()) {
+
             if (block.getInstructions().isEmpty() || !itr.hasNext()) {
                 continue;
             }

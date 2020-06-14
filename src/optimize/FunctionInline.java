@@ -85,9 +85,9 @@ public class FunctionInline {
             unfoldFunction(node, node);
             unfoldFunction(node, node);
             unfoldFunction(node, node);
-            unfoldFunction(node, node);
-            unfoldFunction(node, node);
-            unfoldFunction(node, node);
+//            unfoldFunction(node, node);
+//            unfoldFunction(node, node);
+//            unfoldFunction(node, node);
         }
     }
 
