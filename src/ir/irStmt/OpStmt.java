@@ -57,6 +57,11 @@ public class OpStmt extends YyStmt {
     }
 
     @Override
+    public Item getDef() {
+        return result;
+    }
+
+    @Override
     public HashSet<Item> getUses() {
         return new HashSet<>() {{
             add(opr1);

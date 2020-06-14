@@ -342,7 +342,7 @@ public class RISCVGenerator implements IRVisitor {
 //        var dest = new VIRTUAL();
 //        regMap.put(stmt.getTarget(), dest);
 //        curBlock.add(new MV(dest, phiMap.get(stmt)));
-        curBlock.add(new MV(createReg(stmt.getTarget()), phiMap.get(stmt)));
+        curBlock.add(new MV(createReg(stmt.getResult()), phiMap.get(stmt)));
     }
 
     @Override

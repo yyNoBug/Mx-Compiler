@@ -12,6 +12,8 @@ import java.util.Map;
 abstract public class Statement {
     abstract public void accept(IRVisitor visitor);
 
+    abstract public Item getDef();
+
     abstract public HashSet<Item> getUses();
 
     public abstract Statement transform(HashMap<Item, Item> itemMap);

@@ -23,6 +23,11 @@ public class AllocateStmt extends YyStmt {
     }
 
     @Override
+    public Item getDef() {
+        return null;
+    }
+
+    @Override
     public HashSet<Item> getUses() {
         return new HashSet<>();
     }

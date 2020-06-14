@@ -10,16 +10,16 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class PhiStmt extends Statement {
-    private Local target;
+    private Local result;
     private Map<Block, Item> map;
 
-    public PhiStmt(Local target, Map<Block, Item> map) {
-        this.target = target;
+    public PhiStmt(Local result, Map<Block, Item> map) {
+        this.result = result;
         this.map = map;
     }
 
-    public Local getTarget() {
-        return target;
+    public Local getResult() {
+        return result;
     }
 
     public Map<Block, Item> getMap() {
@@ -32,7 +32,9 @@ public class PhiStmt extends Statement {
         map.forEach((x, y) -> {
             newMap.put(x, itemMap.getOrDefault(y, y));
         });
-        return new PhiStmt(target, newMap);
+        var newResult = result;
+        if (itemMap.containsKey(result)) newResult = (Local) itemMap.get(result);
+        return new PhiStmt(newResult, newMap);
     }
 
     @Override
@@ -49,13 +51,18 @@ public class PhiStmt extends Statement {
     }
 
     @Override
+    public Item getDef() {
+        return result;
+    }
+
+    @Override
     public HashSet<Item> getUses() {
         return null;
     }
 
     @Override
     public String toString() {
-        StringBuilder ret = new StringBuilder(target + " = phi");
+        StringBuilder ret = new StringBuilder(result + " = phi");
         for (var i : map.entrySet()){
             ret.append(" (");
             ret.append(i.getKey());

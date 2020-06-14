@@ -5,6 +5,7 @@ import ir.DeclaredFunction;
 import ir.IRTop;
 import ir.irStmt.*;
 import ir.items.Item;
+import ir.items.Local;
 
 import java.util.*;
 
@@ -79,6 +80,8 @@ public class FunctionInline {
         }
         for (Node node : nodeMap.values()) {
             // Unfold recursive function.
+            unfoldFunction(node, node);
+            //unfoldFunction(node, node);
             //unfoldFunction(node, node);
         }
     }
@@ -113,6 +116,11 @@ public class FunctionInline {
                     for (int j = 0; j < size; ++j) {
                         itemMap.put(b.function.getArgs().get(j), ((CallStmt) statement).getParameters().get(j));
                     }
+                    b.function.getBlockList().forEach(x->{
+                        x.getStmtList().forEach(y -> {
+                            if (y.getDef() != null) itemMap.put(y.getDef(), new Local());
+                        });
+                    });
 
                     Block endBlk = new Block("inline." + count + ".end");
                     var newName = new HashMap<Block, Block>();

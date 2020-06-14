@@ -49,6 +49,11 @@ public class CallStmt extends YyStmt {
     }
 
     @Override
+    public Item getDef() {
+        return result;
+    }
+
+    @Override
     public HashSet<Item> getUses() {
         return new HashSet<>() {{
             this.addAll(parameters);
@@ -60,7 +65,7 @@ public class CallStmt extends YyStmt {
         StringBuilder ret = new StringBuilder(result + " = " + function + "(");
         boolean flag = false;
         for (Item parameter : parameters) {
-            if (flag) ret.append(" ,");
+            if (flag) ret.append(", ");
             ret.append(parameter);
             flag = true;
         }
