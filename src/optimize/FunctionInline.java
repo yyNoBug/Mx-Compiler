@@ -16,22 +16,24 @@ public class FunctionInline {
         DeclaredFunction function;
         Set<Node> next = new HashSet<>();
         Set<Node> prev = new HashSet<>();
-        int size;
-
 
         public Node(DeclaredFunction function) {
             this.function = function;
-            size = 0;
+        }
+
+        public int getSize() {
+            int size = 0;
             for (Block block : function.getBlockList()) {
                 size += block.getStmtList().size();
             }
+            return size;
         }
     }
 
     private class NodeComparator implements Comparator<Node> {
         @Override
         public int compare(Node o1, Node o2) {
-            return Integer.compare(o1.size, o2.size);
+            return Integer.compare(o1.getSize(), o2.getSize());
         }
     }
 
@@ -81,8 +83,11 @@ public class FunctionInline {
         for (Node node : nodeMap.values()) {
             // Unfold recursive function.
             unfoldFunction(node, node);
-            //unfoldFunction(node, node);
-            //unfoldFunction(node, node);
+            unfoldFunction(node, node);
+            unfoldFunction(node, node);
+            unfoldFunction(node, node);
+            unfoldFunction(node, node);
+            unfoldFunction(node, node);
         }
     }
 
@@ -95,7 +100,7 @@ public class FunctionInline {
     private int count = 0;
 
     private void unfoldFunction(Node a, Node b) {
-        int maxTimes = (limit - a.size) / b.size;
+        int maxTimes = (limit - a.getSize()) / b.getSize();
         int times = 0;
         Map<Block, Block> target = new HashMap<>();
         Map<Block, Block> from = new HashMap<>();
