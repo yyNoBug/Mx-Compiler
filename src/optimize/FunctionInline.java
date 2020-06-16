@@ -10,7 +10,7 @@ import ir.items.Local;
 import java.util.*;
 
 public class FunctionInline {
-    static private int limit = 2048;
+    static private int limit = 150;
 
     private class Node{
         DeclaredFunction function;
@@ -82,6 +82,8 @@ public class FunctionInline {
         }
         for (Node node : nodeMap.values()) {
             // Unfold recursive function.
+            unfoldFunction(node, node);
+            unfoldFunction(node, node);
             unfoldFunction(node, node);
             unfoldFunction(node, node);
             unfoldFunction(node, node);
