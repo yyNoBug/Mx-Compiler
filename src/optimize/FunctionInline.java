@@ -10,7 +10,7 @@ import ir.items.Local;
 import java.util.*;
 
 public class FunctionInline {
-    static private int limit = 1024;
+    static private int limit = 2048;
 
     private class Node{
         DeclaredFunction function;
